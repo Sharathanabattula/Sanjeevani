@@ -25,4 +25,11 @@ window.SANJEEVANI_CONFIG = {
 
   // Social-proof baseline (added to actual count for the "X people in line" message)
   waitlistBaseCount: 12847,
+
+  // === Supabase (cloud sync + Google sign-in) ===
+  // Get these from your Supabase project: Settings → API.
+  //   - URL is your project URL (https://xxxxx.supabase.co).
+  //   - Key is the PUBLISHABLE key (browser-safe). DO NOT paste the secret one.
+  // supabaseUrl: 'https://YOUR_PROJECT_ID.supabase.co',
+  // supabaseKey: 'sb_publishable_XXXXXXXXXXXXXXXXXXXX',
 };

@@ -8,3 +8,4 @@ web-design-main/
 config.local.js
 .env
 .env.local
+.vercel

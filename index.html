@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sanjeevani — AI-Powered Health Ecosystem</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>
@@ -1070,9 +1071,12 @@ tailwind.config = {
       <a href="#coach" class="nav-link">AI Coach</a>
       <a href="#scanner" class="nav-link">Food Scanner</a>
       <a href="#story" class="nav-link">Our Story</a>
-      <a href="#download" class="cta-btn px-5 py-2.5 rounded-xl font-semibold text-sm text-white">
-        <span>Get Started</span>
-      </a>
+      <div id="auth-slot-desktop" class="flex items-center gap-3">
+        <button type="button" data-auth-action="signin" class="cta-btn px-5 py-2.5 rounded-xl font-semibold text-sm text-white inline-flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.5-5.2l-6.2-5.2c-2.1 1.5-4.6 2.4-7.3 2.4-5.2 0-9.6-3.3-11.2-8l-6.5 5C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C40.9 35.5 44 30.2 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+          <span>Sign in with Google</span>
+        </button>
+      </div>
     </div>
     <button class="md:hidden text-forest-300 p-2" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
       <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
@@ -1090,7 +1094,12 @@ tailwind.config = {
   <a href="#coach" class="text-forest-200 font-medium text-lg" onclick="document.getElementById('mobileMenu').classList.remove('open')">AI Coach</a>
   <a href="#scanner" class="text-forest-200 font-medium text-lg" onclick="document.getElementById('mobileMenu').classList.remove('open')">Food Scanner</a>
   <a href="#story" class="text-forest-200 font-medium text-lg" onclick="document.getElementById('mobileMenu').classList.remove('open')">Our Story</a>
-  <a href="#download" class="cta-btn px-5 py-3 rounded-xl font-semibold text-center text-white mt-4"><span>Get Started</span></a>
+  <div id="auth-slot-mobile" class="mt-4">
+    <button type="button" data-auth-action="signin" class="cta-btn w-full px-5 py-3 rounded-xl font-semibold text-center text-white inline-flex items-center justify-center gap-2">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.5-5.2l-6.2-5.2c-2.1 1.5-4.6 2.4-7.3 2.4-5.2 0-9.6-3.3-11.2-8l-6.5 5C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C40.9 35.5 44 30.2 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+      <span>Sign in with Google</span>
+    </button>
+  </div>
 </div>
 
 
@@ -2251,8 +2260,97 @@ tailwind.config = {
 <!-- Toast -->
 <div id="sj-toast" class="sj-toast" role="status" aria-live="polite"></div>
 
-<!-- Local config (gitignored). Optional: sets window.SANJEEVANI_CONFIG = { geminiApiKey: '...' } -->
-<script src="config.local.js"></script>
+<!-- Local config (gitignored). Optional dev overrides like geminiApiKey. 404 in production is expected. -->
+<script src="config.local.js" onerror="this.onerror=null"></script>
+<!-- Public config (committed). Provides Supabase URL + publishable key + sane defaults. -->
+<script src="config.js"></script>
+
+<!-- ==================== AUTH (Supabase + Google) ==================== -->
+<script>
+(() => {
+  const cfg = (typeof window !== 'undefined' && window.SANJEEVANI_CONFIG) || {};
+  const url = cfg.supabaseUrl;
+  const key = cfg.supabaseKey;
+  if (!url || !key || !window.supabase) {
+    console.warn('[Sanjeevani] Supabase not configured — auth disabled.');
+    return;
+  }
+  const sb = window.supabase.createClient(url, key, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  window.SANJEEVANI_SB = sb;
+
+  const signedOutHTML = `
+    <button type="button" data-auth-action="signin" class="cta-btn px-5 py-2.5 rounded-xl font-semibold text-sm text-white inline-flex items-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.5-5.2l-6.2-5.2c-2.1 1.5-4.6 2.4-7.3 2.4-5.2 0-9.6-3.3-11.2-8l-6.5 5C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C40.9 35.5 44 30.2 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+      <span>Sign in with Google</span>
+    </button>`;
+
+  const signedInHTML = (user) => {
+    const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email || 'Account';
+    const avatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+    const initial = (name[0] || '?').toUpperCase();
+    const avatarEl = avatar
+      ? `<img src="${avatar}" alt="" class="w-8 h-8 rounded-full object-cover ring-2 ring-forest-500/40" referrerpolicy="no-referrer">`
+      : `<div class="w-8 h-8 rounded-full bg-forest-600 text-white text-sm font-semibold flex items-center justify-center ring-2 ring-forest-500/40">${initial}</div>`;
+    return `
+      <div class="flex items-center gap-3">
+        ${avatarEl}
+        <span class="hidden lg:inline text-forest-100 text-sm font-medium max-w-[140px] truncate">${name}</span>
+        <button type="button" data-auth-action="signout" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-forest-100 bg-forest-800/40 hover:bg-forest-700/60 border border-forest-700/40 transition">Sign out</button>
+      </div>`;
+  };
+
+  const render = (session) => {
+    const user = session?.user;
+    const desktop = document.getElementById('auth-slot-desktop');
+    const mobile = document.getElementById('auth-slot-mobile');
+    if (desktop) desktop.innerHTML = user ? signedInHTML(user) : signedOutHTML;
+    if (mobile)  mobile.innerHTML  = user ? signedInHTML(user) : signedOutHTML;
+    document.body.dataset.authed = user ? 'true' : 'false';
+  };
+
+  const signIn = async () => {
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin + window.location.pathname }
+    });
+    if (error) console.error('[Sanjeevani] signIn error:', error);
+  };
+
+  const signOut = async () => {
+    const { error } = await sb.auth.signOut();
+    if (error) console.error('[Sanjeevani] signOut error:', error);
+  };
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-auth-action]');
+    if (!btn) return;
+    const action = btn.getAttribute('data-auth-action');
+    if (action === 'signin') signIn();
+    else if (action === 'signout') signOut();
+  });
+
+  // Make nav/footer links open the actual feature modals instead of just scrolling.
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href="#coach"], a[href="#scanner"]');
+    if (!a) return;
+    const target = a.getAttribute('href');
+    e.preventDefault();
+    document.getElementById('mobileMenu')?.classList.remove('open');
+    if (target === '#coach') {
+      try { window.SANJEEVANI_COACH?.open(); }
+      catch (_) { document.getElementById('coach-open-btn')?.click(); }
+    } else if (target === '#scanner') {
+      try { window.SANJEEVANI?.openScanner(); }
+      catch (_) { document.getElementById('sj-open-scanner')?.click(); }
+    }
+  });
+
+  sb.auth.getSession().then(({ data }) => render(data.session));
+  sb.auth.onAuthStateChange((_event, session) => render(session));
+})();
+</script>
 
 <!-- ==================== SANJEEVANI ENGINE ==================== -->
 <script>
@@ -3218,7 +3316,150 @@ Try this in the meantime: drink a glass of water and take 10 slow breaths.`;
     init();
   }
 
-  return { open, close, newConversation, sendUserMessage };
+  return { open, close, newConversation, sendUserMessage, _refresh: render };
+})();
+
+
+/* ==================== SANJEEVANI COACH SYNC (Supabase) ==================== */
+const SANJEEVANI_COACH_SYNC = (() => {
+  const TABLE = 'coach_conversations';
+  const SCHEMA = 'sanjeevani';
+  const PUSH_DEBOUNCE_MS = 1500;
+  const POLL_INTERVAL_MS = 2000;
+
+  let currentUserId = null;
+  let pushTimer = null;
+  let pollTimer = null;
+  const lastSyncedUpdatedAt = new Map(); // convId -> updated_at (number)
+
+  const sb = () => window.SANJEEVANI_SB;
+  const table = () => sb().schema(SCHEMA).from(TABLE);
+
+  function getLocalCoach() {
+    const s = SANJEEVANI.loadState();
+    if (!s.coach) s.coach = { conversations: [], activeId: null, profile: {} };
+    return s.coach;
+  }
+
+  function setLocalCoach(coach) {
+    SANJEEVANI.patchState({ coach });
+  }
+
+  function isUuid(v) {
+    return typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+  }
+
+  async function pullFromCloud() {
+    if (!currentUserId) return;
+    const { data, error } = await table()
+      .select('id, title, messages, created_at, updated_at')
+      .eq('user_id', currentUserId)
+      .order('updated_at', { ascending: false })
+      .limit(20);
+    if (error) { console.error('[Sync] pull error:', error); return; }
+
+    const conversations = (data || []).map(row => ({
+      id: row.id,
+      title: row.title || 'New chat',
+      started_at: new Date(row.created_at).getTime(),
+      updated_at: new Date(row.updated_at).getTime(),
+      messages: Array.isArray(row.messages) ? row.messages : [],
+    }));
+
+    const coach = getLocalCoach();
+    coach.conversations = conversations;
+    if (!conversations.find(c => c.id === coach.activeId)) {
+      coach.activeId = conversations[0]?.id || null;
+    }
+    setLocalCoach(coach);
+
+    lastSyncedUpdatedAt.clear();
+    for (const c of conversations) lastSyncedUpdatedAt.set(c.id, c.updated_at);
+
+    try { SANJEEVANI_COACH._refresh && SANJEEVANI_COACH._refresh(); } catch (_) {}
+  }
+
+  async function pushConv(conv) {
+    if (!currentUserId || !conv) return;
+    if (!isUuid(conv.id)) return; // legacy non-uuid ids — skip
+    if (!conv.messages || conv.messages.length === 0) return; // empty placeholder, don't push
+    const payload = {
+      id: conv.id,
+      user_id: currentUserId,
+      title: conv.title || 'New chat',
+      messages: conv.messages,
+      updated_at: new Date(conv.updated_at || Date.now()).toISOString(),
+    };
+    const { error } = await table().upsert(payload, { onConflict: 'id' });
+    if (error) { console.error('[Sync] push error:', error); return; }
+    lastSyncedUpdatedAt.set(conv.id, conv.updated_at);
+  }
+
+  function schedulePush() {
+    if (pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(syncDirtyConversations, PUSH_DEBOUNCE_MS);
+  }
+
+  async function syncDirtyConversations() {
+    if (!currentUserId) return;
+    const coach = getLocalCoach();
+    for (const conv of coach.conversations || []) {
+      const lastPushed = lastSyncedUpdatedAt.get(conv.id);
+      if (lastPushed !== conv.updated_at) {
+        await pushConv(conv);
+      }
+    }
+  }
+
+  function startPolling() {
+    stopPolling();
+    pollTimer = setInterval(() => {
+      if (!currentUserId) return;
+      const coach = getLocalCoach();
+      let dirty = false;
+      for (const conv of coach.conversations || []) {
+        if (lastSyncedUpdatedAt.get(conv.id) !== conv.updated_at) { dirty = true; break; }
+      }
+      if (dirty) schedulePush();
+    }, POLL_INTERVAL_MS);
+  }
+
+  function stopPolling() {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  async function onSignIn(userId) {
+    currentUserId = userId;
+    await pullFromCloud();
+    startPolling();
+  }
+
+  function onSignOut() {
+    currentUserId = null;
+    stopPolling();
+    lastSyncedUpdatedAt.clear();
+  }
+
+  function init() {
+    if (!sb()) { console.warn('[Sync] Supabase not initialized, coach sync disabled.'); return; }
+    sb().auth.getSession().then(({ data }) => {
+      const uid = data.session?.user?.id;
+      if (uid) onSignIn(uid);
+    });
+    sb().auth.onAuthStateChange((event, session) => {
+      const uid = session?.user?.id;
+      if (uid && uid !== currentUserId) onSignIn(uid);
+      else if (!uid && currentUserId) onSignOut();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  return { _pull: pullFromCloud, _push: syncDirtyConversations };
 })();
 
 
