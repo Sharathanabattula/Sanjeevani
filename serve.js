@@ -20,6 +20,8 @@ const MIME = {
   '.pdf': 'application/pdf',
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
+  '.mjs': 'application/javascript; charset=utf-8',
 };
 
 http.createServer((req, res) => {

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a1f12"/>
+      <stop offset="55%" stop-color="#1B5E20"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.55">
+      <stop offset="0%" stop-color="#00E676" stop-opacity="0.55"/>
+      <stop offset="60%" stop-color="#00E676" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#00E676" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="leaf" x1="0.2" y1="0.1" x2="0.8" y2="0.95">
+      <stop offset="0%" stop-color="#A7F3B6"/>
+      <stop offset="55%" stop-color="#4CAF50"/>
+      <stop offset="100%" stop-color="#1B5E20"/>
+    </linearGradient>
+    <linearGradient id="vein" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8FFE5" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#E8FFE5" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="112" fill="url(#glow)"/>
+
+  <!-- Soft inner ring -->
+  <circle cx="256" cy="256" r="186" stroke="#A7F3B6" stroke-opacity="0.06" stroke-width="2"/>
+
+  <!-- Leaf -->
+  <g transform="translate(256 256) rotate(-22) translate(-256 -256)">
+    <path d="M256 102
+             C 162 132, 110 220, 130 322
+             C 146 402, 218 444, 282 426
+             C 360 404, 410 326, 402 232
+             C 396 156, 332 100, 256 102 Z"
+          fill="url(#leaf)"/>
+    <!-- Central vein -->
+    <path d="M226 410 C 248 320, 290 230, 372 158"
+          stroke="url(#vein)" stroke-width="10" stroke-linecap="round" fill="none"/>
+    <!-- Side veins -->
+    <path d="M260 332 C 290 312, 320 290, 348 256" stroke="#E8FFE5" stroke-opacity="0.55" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M244 374 C 280 352, 318 326, 352 290" stroke="#E8FFE5" stroke-opacity="0.40" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M286 286 C 318 268, 348 244, 374 212" stroke="#E8FFE5" stroke-opacity="0.50" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <!-- Drop / highlight -->
+    <ellipse cx="200" cy="200" rx="20" ry="34" fill="#E8FFE5" fill-opacity="0.35" transform="rotate(-25 200 200)"/>
+  </g>
+</svg>

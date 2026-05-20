@@ -2,8 +2,30 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Sanjeevani — AI-Powered Health Ecosystem</title>
+
+<!-- PWA: installable on Android & iOS home screens -->
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0a120c">
+<meta name="color-scheme" content="dark">
+<meta name="application-name" content="Sanjeevani">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sanjeevani">
+<link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png">
+<meta name="description" content="Your AI-powered health companion. Scan meals, chat with an AI coach trained for Indian diets, track your nutrition.">
+<meta property="og:title" content="Sanjeevani — AI Health Coach">
+<meta property="og:description" content="Scan meals, chat with an AI coach trained for Indian diets, track your nutrition.">
+<meta property="og:image" content="/icons/icon-512.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -701,6 +723,166 @@ tailwind.config = {
     transition: opacity 0.25s ease, transform 0.25s ease;
   }
   .profile-saved-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---- PWA install banner ---- */
+  .pwa-install {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    z-index: 60;
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+  .pwa-install.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .pwa-install-card {
+    max-width: 460px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, rgba(20, 35, 22, 0.96), rgba(13, 21, 14, 0.96));
+    border: 1px solid rgba(76, 175, 80, 0.28);
+    border-radius: 18px;
+    padding: 14px 14px 14px 16px;
+    box-shadow: 0 24px 50px -16px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 230, 118, 0.06) inset;
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .pwa-install-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: url('/icons/icon-192.png') center/cover no-repeat;
+    box-shadow: 0 6px 16px -6px rgba(0, 230, 118, 0.45);
+  }
+  .pwa-install-text { flex: 1 1 auto; min-width: 0; }
+  .pwa-install-title {
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .pwa-install-sub {
+    color: rgba(220, 240, 224, 0.60);
+    font-size: 12px;
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .pwa-install-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .pwa-install-btn {
+    padding: 9px 14px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1B5E20, #2E7D32);
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    white-space: nowrap;
+  }
+  .pwa-install-btn:hover { transform: translateY(-1px); }
+  .pwa-install-dismiss {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(220, 240, 224, 0.55);
+    border: 1px solid rgba(76, 175, 80, 0.12);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .pwa-install-dismiss:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+
+  /* iOS-specific instructions sheet */
+  .pwa-ios-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgba(8, 14, 10, 0.65);
+    backdrop-filter: blur(8px);
+    padding: 16px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  }
+  .pwa-ios-sheet.show { display: flex; }
+  .pwa-ios-card {
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(180deg, #131c14, #0d150e);
+    border: 1px solid rgba(76, 175, 80, 0.22);
+    border-radius: 22px;
+    padding: 22px 22px 20px;
+    box-shadow: 0 24px 50px -16px rgba(0, 0, 0, 0.6);
+    animation: pwa-slide-up 0.32s ease;
+  }
+  @keyframes pwa-slide-up { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .pwa-ios-title {
+    font-family: 'Syne', sans-serif;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .pwa-ios-sub {
+    color: rgba(220, 240, 224, 0.55);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .pwa-ios-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(76, 175, 80, 0.06);
+    border: 1px solid rgba(76, 175, 80, 0.10);
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  .pwa-ios-step:last-child { margin-bottom: 16px; }
+  .pwa-ios-step-num {
+    width: 24px; height: 24px;
+    border-radius: 999px;
+    background: rgba(0, 230, 118, 0.18);
+    color: #b8f1c5;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .pwa-ios-step-text { color: rgba(240, 245, 241, 0.85); font-size: 13.5px; line-height: 1.4; }
+  .pwa-ios-step-text strong { color: #fff; }
+  .pwa-ios-share-icon {
+    display: inline-flex;
+    vertical-align: middle;
+    color: #4CAF50;
+    margin: 0 2px;
+  }
+  .pwa-ios-close {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(76, 175, 80, 0.10);
+    color: #e0eee2;
+    font-weight: 600;
+    font-size: 14px;
+    border: 1px solid rgba(76, 175, 80, 0.18);
+    cursor: pointer;
+  }
+  .pwa-ios-close:hover { background: rgba(76, 175, 80, 0.18); }
   .coach-dialog::backdrop {
     background: rgba(20, 20, 25, 0.55);
     backdrop-filter: blur(18px);
@@ -4706,6 +4888,181 @@ const SANJEEVANI_WAITLIST = (() => {
   }
 
   return { totalCount, positionOf, getMyEntry };
+})();
+</script>
+
+
+<!-- ==================== PWA INSTALL UI ==================== -->
+<div id="pwa-install" class="pwa-install" role="dialog" aria-live="polite" aria-label="Install Sanjeevani">
+  <div class="pwa-install-card">
+    <div class="pwa-install-icon" aria-hidden="true"></div>
+    <div class="pwa-install-text">
+      <div class="pwa-install-title">Install Sanjeevani</div>
+      <div id="pwa-install-sub" class="pwa-install-sub">Add to your home screen for one-tap access</div>
+    </div>
+    <div class="pwa-install-actions">
+      <button id="pwa-install-btn" type="button" class="pwa-install-btn">Install</button>
+      <button id="pwa-install-dismiss" type="button" class="pwa-install-dismiss" aria-label="Not now">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="pwa-ios-sheet" class="pwa-ios-sheet" role="dialog" aria-modal="true" aria-labelledby="pwa-ios-title">
+  <div class="pwa-ios-card">
+    <div id="pwa-ios-title" class="pwa-ios-title">Add to your Home Screen</div>
+    <p class="pwa-ios-sub">Sanjeevani works best as an app. iOS Safari needs two taps to add it.</p>
+    <div class="pwa-ios-step">
+      <span class="pwa-ios-step-num">1</span>
+      <span class="pwa-ios-step-text">Tap the <strong>Share</strong> icon
+        <svg class="pwa-ios-share-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        in the toolbar below
+      </span>
+    </div>
+    <div class="pwa-ios-step">
+      <span class="pwa-ios-step-num">2</span>
+      <span class="pwa-ios-step-text">Scroll and tap <strong>Add to Home Screen</strong></span>
+    </div>
+    <div class="pwa-ios-step">
+      <span class="pwa-ios-step-num">3</span>
+      <span class="pwa-ios-step-text">Tap <strong>Add</strong> — Sanjeevani is now on your home screen</span>
+    </div>
+    <button id="pwa-ios-close" type="button" class="pwa-ios-close">Got it</button>
+  </div>
+</div>
+
+<script>
+/* ==================== SANJEEVANI PWA (install + service worker) ==================== */
+(() => {
+  const DISMISS_KEY = 'sj_pwa_dismissed_at';
+  const DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+  const ENGAGEMENT_DELAY_MS = 8000; // show after 8s on page
+
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isAndroid = /android/i.test(ua);
+  const isMobile = isIOS || isAndroid || /Mobi/.test(ua);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+
+  let deferredPrompt = null;
+  let bannerShown = false;
+  const $ = (id) => document.getElementById(id);
+
+  // --- service worker registration ---
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(reg => {
+        // If a new SW is waiting after deploy, activate it on next nav
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          nw && nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              try { reg.waiting?.postMessage('SKIP_WAITING'); } catch (_) {}
+            }
+          });
+        });
+      }).catch(err => console.warn('[PWA] SW registration failed:', err));
+    });
+  }
+
+  // --- dismissal memory ---
+  function recentlyDismissed() {
+    try {
+      const ts = Number(localStorage.getItem(DISMISS_KEY) || 0);
+      return ts && (Date.now() - ts) < DISMISS_TTL_MS;
+    } catch { return false; }
+  }
+  function markDismissed() {
+    try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch {}
+  }
+
+  // --- visibility logic ---
+  function shouldShow() {
+    if (isStandalone) return false;
+    if (!isMobile) return false;       // only mobile gets the banner
+    if (recentlyDismissed()) return false;
+    return true;
+  }
+
+  function showBanner(subText) {
+    if (bannerShown) return;
+    const el = $('pwa-install');
+    if (!el) return;
+    if (subText) $('pwa-install-sub').textContent = subText;
+    el.classList.add('show');
+    bannerShown = true;
+  }
+  function hideBanner() {
+    const el = $('pwa-install');
+    if (!el) return;
+    el.classList.remove('show');
+    bannerShown = false;
+  }
+
+  function showIosSheet() { $('pwa-ios-sheet')?.classList.add('show'); }
+  function hideIosSheet() { $('pwa-ios-sheet')?.classList.remove('show'); }
+
+  // --- Android / Chromium native prompt ---
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (shouldShow()) {
+      // Wait until user is at least mildly engaged before showing
+      setTimeout(() => { if (shouldShow()) showBanner(); }, ENGAGEMENT_DELAY_MS);
+    }
+  });
+
+  // --- iOS fallback: no beforeinstallprompt, show after engagement ---
+  if (isIOS && shouldShow()) {
+    setTimeout(() => {
+      if (!shouldShow()) return;
+      showBanner('Tap install to add Sanjeevani to your home screen');
+    }, ENGAGEMENT_DELAY_MS);
+  }
+
+  // --- after install ---
+  window.addEventListener('appinstalled', () => {
+    hideBanner();
+    deferredPrompt = null;
+    markDismissed();
+  });
+
+  // --- click handlers (delegated so they survive any DOM swap) ---
+  document.addEventListener('click', async (e) => {
+    if (e.target.closest('#pwa-install-btn')) {
+      if (isIOS && !deferredPrompt) { showIosSheet(); return; }
+      if (deferredPrompt) {
+        const prompt = deferredPrompt;
+        deferredPrompt = null;
+        hideBanner();
+        try {
+          await prompt.prompt();
+          const choice = await prompt.userChoice;
+          if (choice.outcome === 'dismissed') markDismissed();
+        } catch (_) {}
+      } else {
+        // Last-resort: no prompt available (Chrome already used it, or unsupported)
+        if (isIOS) showIosSheet();
+      }
+    } else if (e.target.closest('#pwa-install-dismiss')) {
+      hideBanner();
+      markDismissed();
+    } else if (e.target.closest('#pwa-ios-close') || (e.target.id === 'pwa-ios-sheet')) {
+      hideIosSheet();
+    }
+  });
+
+  // --- Deep-link shortcuts from manifest (?action=scan / ?action=coach) ---
+  window.addEventListener('load', () => {
+    try {
+      const p = new URLSearchParams(location.search);
+      const action = p.get('action');
+      if (action === 'scan') setTimeout(() => window.SANJEEVANI?.openScanner?.(), 600);
+      else if (action === 'coach') setTimeout(() => window.SANJEEVANI_COACH?.open?.(), 600);
+    } catch (_) {}
+  });
 })();
 </script>
 
