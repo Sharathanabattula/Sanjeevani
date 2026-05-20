@@ -1609,7 +1609,7 @@ const SANJEEVANI = (() => {
   // ---- Config ----
   const cfg = (typeof window !== 'undefined' && window.SANJEEVANI_CONFIG) || {};
   const GEMINI_API_KEY = cfg.geminiApiKey || '';
-  const GEMINI_MODEL = cfg.geminiModel || 'gemini-1.5-flash-latest';
+  const GEMINI_MODEL = cfg.geminiModel || 'gemini-flash-latest';
   const STORAGE_KEY = 'sanjeevani.state.v1';
   const MAX_IMAGE_DIM = 1024;
   const JPEG_QUALITY = 0.85;
@@ -1813,7 +1813,12 @@ If the image is not food, return {"error": "not_food"}.`;
           { inline_data: { mime_type: 'image/jpeg', data: base64 } },
         ],
       }],
-      generationConfig: { temperature: 0.3, responseMimeType: 'application/json' },
+      generationConfig: {
+        temperature: 0.3,
+        responseMimeType: 'application/json',
+        maxOutputTokens: 1024,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     };
     const res = await fetch(url, {
       method: 'POST',

@@ -4,5 +4,5 @@
 // config.local.js is gitignored — never commit your real key.
 window.SANJEEVANI_CONFIG = {
   geminiApiKey: 'YOUR_FREE_GEMINI_API_KEY_HERE',
-  geminiModel: 'gemini-1.5-flash-latest',
+  geminiModel: 'gemini-flash-latest',
 };
