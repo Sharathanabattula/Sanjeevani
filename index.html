@@ -432,6 +432,62 @@ tailwind.config = {
     height: 100%;
     color: #1d1d1f;
   }
+  .coach-gate {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 25, 18, 0.92);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 24px;
+    border-radius: inherit;
+  }
+  body[data-authed="true"] .coach-gate { display: none; }
+  .coach-gate-card {
+    max-width: 360px;
+    text-align: center;
+    padding: 32px 28px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(76, 175, 80, 0.10), rgba(76, 175, 80, 0.02));
+    border: 1px solid rgba(76, 175, 80, 0.25);
+  }
+  .coach-gate-icon {
+    width: 56px; height: 56px;
+    border-radius: 999px;
+    background: rgba(0, 230, 118, 0.15);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+    font-size: 28px;
+  }
+  .coach-gate-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #ffffff;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .coach-gate-sub {
+    color: rgba(220, 240, 224, 0.65);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .coach-gate-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1B5E20, #2E7D32);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .coach-gate-btn:hover { transform: translateY(-1px); }
   .coach-dialog::backdrop {
     background: rgba(20, 20, 25, 0.55);
     backdrop-filter: blur(18px);
@@ -1272,14 +1328,29 @@ tailwind.config = {
         <!-- Shimmer effect -->
         <div class="absolute inset-0 shimmer rounded-3xl"></div>
 
+        <!-- Sign-in gate (shown when signed out) -->
+        <div id="dash-signin-gate" class="relative mb-6 p-4 rounded-2xl bg-forest-glow/10 border border-forest-glow/20 flex items-center justify-between gap-4 flex-wrap">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-full bg-forest-glow/20 flex items-center justify-center shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2"><path d="M12 11c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm5 9H7v-2c0-1.66 3.34-2.5 5-2.5s5 .84 5 2.5v2z"/></svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-forest-100 text-sm font-semibold">Sign in to make this dashboard yours</p>
+              <p class="text-forest-300/50 text-xs">Your real meals, streaks, and AI insights — synced across devices</p>
+            </div>
+          </div>
+          <button type="button" data-auth-action="signin" class="cta-btn px-4 py-2 rounded-xl font-semibold text-sm text-white shrink-0">Sign in</button>
+        </div>
+
         <!-- Header -->
         <div class="relative flex items-center justify-between mb-8">
           <div>
-            <p class="text-forest-300/60 text-sm">Good Morning,</p>
-            <h3 class="font-display font-bold text-2xl text-white">Sai! 👋</h3>
+            <p id="dash-greeting" class="text-forest-300/60 text-sm">Good morning,</p>
+            <h3 id="dash-name" class="font-display font-bold text-2xl text-white">Friend! 👋</h3>
           </div>
-          <div class="w-10 h-10 rounded-full bg-forest-600/20 flex items-center justify-center">
-            <svg width="20" height="20" fill="none" stroke="#4CAF50" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div class="text-right">
+            <p class="text-forest-300/50 text-xs uppercase tracking-wider">Streak</p>
+            <p class="font-display font-bold text-2xl text-forest-glow"><span id="dash-streak-value">0</span> 🔥</p>
           </div>
         </div>
 
@@ -1297,72 +1368,82 @@ tailwind.config = {
                   </linearGradient>
                 </defs>
                 <circle class="score-ring-bg" cx="60" cy="60" r="54" fill="none" stroke-width="8"/>
-                <circle class="score-ring-fill" cx="60" cy="60" r="54" fill="none" stroke-width="8" stroke-linecap="round"/>
+                <circle id="dash-score-ring" class="score-ring-fill" cx="60" cy="60" r="54" fill="none" stroke-width="8" stroke-linecap="round" style="transition: stroke-dashoffset 0.8s ease-out;"/>
               </svg>
               <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="font-display font-800 text-5xl text-white counter" data-target="86" data-noanim="true">86</span>
-                <span class="text-forest-glow text-sm font-semibold mt-1">Excellent</span>
+                <span id="dash-score" class="font-display font-800 text-5xl text-white">0</span>
+                <span id="dash-score-label" class="text-forest-glow text-sm font-semibold mt-1">Start scanning</span>
               </div>
             </div>
-            <p class="text-forest-300/50 text-sm mt-4">Health Score — Better than 72% of users</p>
+            <p id="dash-score-sub" class="text-forest-300/50 text-sm mt-4 text-center">Sign in to see your real score</p>
           </div>
 
           <!-- Stats Grid -->
           <div class="grid grid-cols-2 gap-4">
-            <!-- Steps -->
-            <div class="bg-forest-900/40 rounded-2xl p-5 border border-forest-700/10">
-              <div class="flex items-center gap-2 mb-3">
-                <span class="text-lg">👟</span>
-                <span class="text-forest-300/50 text-xs uppercase tracking-wider">Steps</span>
-              </div>
-              <div class="font-display font-bold text-xl text-white">8,245</div>
-              <div class="text-forest-400/40 text-xs mt-1">/10,000</div>
-              <div class="stat-bar mt-3"><div class="stat-bar-fill" style="--target-width: 82%;" data-width="82"></div></div>
-            </div>
-
             <!-- Calories -->
             <div class="bg-forest-900/40 rounded-2xl p-5 border border-forest-700/10">
               <div class="flex items-center gap-2 mb-3">
                 <span class="text-lg">🔥</span>
                 <span class="text-forest-300/50 text-xs uppercase tracking-wider">Calories</span>
               </div>
-              <div class="font-display font-bold text-xl text-white">450</div>
-              <div class="text-forest-400/40 text-xs mt-1">/500 kcal</div>
-              <div class="stat-bar mt-3"><div class="stat-bar-fill" data-width="90"></div></div>
+              <div class="font-display font-bold text-xl text-white"><span id="dash-kcal-value">0</span></div>
+              <div id="dash-kcal-sub" class="text-forest-400/40 text-xs mt-1">/2000 kcal</div>
+              <div class="stat-bar mt-3"><div id="dash-kcal-bar" class="stat-bar-fill" style="width:0%"></div></div>
             </div>
 
-            <!-- Sleep -->
+            <!-- Protein -->
             <div class="bg-forest-900/40 rounded-2xl p-5 border border-forest-700/10">
               <div class="flex items-center gap-2 mb-3">
-                <span class="text-lg">🌙</span>
-                <span class="text-forest-300/50 text-xs uppercase tracking-wider">Sleep</span>
+                <span class="text-lg">🥚</span>
+                <span class="text-forest-300/50 text-xs uppercase tracking-wider">Protein</span>
               </div>
-              <div class="font-display font-bold text-xl text-white">7h 23m</div>
-              <div class="text-forest-400/40 text-xs mt-1">/8h</div>
-              <div class="stat-bar mt-3"><div class="stat-bar-fill" data-width="92"></div></div>
+              <div class="font-display font-bold text-xl text-white"><span id="dash-protein-value">0g</span></div>
+              <div id="dash-protein-sub" class="text-forest-400/40 text-xs mt-1">/60g</div>
+              <div class="stat-bar mt-3"><div id="dash-protein-bar" class="stat-bar-fill" style="width:0%"></div></div>
             </div>
 
-            <!-- Water -->
+            <!-- Fiber -->
             <div class="bg-forest-900/40 rounded-2xl p-5 border border-forest-700/10">
               <div class="flex items-center gap-2 mb-3">
-                <span class="text-lg">💧</span>
-                <span class="text-forest-300/50 text-xs uppercase tracking-wider">Water</span>
+                <span class="text-lg">🌾</span>
+                <span class="text-forest-300/50 text-xs uppercase tracking-wider">Fiber</span>
               </div>
-              <div class="font-display font-bold text-xl text-white">1.8</div>
-              <div class="text-forest-400/40 text-xs mt-1">/2.5 L</div>
-              <div class="stat-bar mt-3"><div class="stat-bar-fill" data-width="72"></div></div>
+              <div class="font-display font-bold text-xl text-white"><span id="dash-fiber-value">0g</span></div>
+              <div id="dash-fiber-sub" class="text-forest-400/40 text-xs mt-1">/30g</div>
+              <div class="stat-bar mt-3"><div id="dash-fiber-bar" class="stat-bar-fill" style="width:0%"></div></div>
             </div>
+
+            <!-- Quick scan CTA -->
+            <button type="button" onclick="SANJEEVANI.openScanner()" class="bg-forest-glow/10 hover:bg-forest-glow/20 rounded-2xl p-5 border border-forest-glow/20 text-left transition group">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-lg">📸</span>
+                <span class="text-forest-glow text-xs uppercase tracking-wider font-semibold">Scan</span>
+              </div>
+              <div class="font-display font-bold text-base text-white leading-tight">Add a meal</div>
+              <div class="text-forest-300/50 text-xs mt-1">Tap to open scanner →</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent meals -->
+        <div class="relative mt-8">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-forest-300/60 text-xs uppercase tracking-wider font-semibold">Recent Meals</p>
+            <button type="button" onclick="SANJEEVANI.openScanner()" class="text-forest-glow text-xs font-semibold hover:text-white transition">+ Add</button>
+          </div>
+          <div id="dash-recent-meals" class="rounded-2xl bg-forest-900/20 border border-forest-700/10 p-4">
+            <p class="text-forest-300/40 text-sm italic">Loading…</p>
           </div>
         </div>
 
         <!-- AI Insight -->
-        <div class="relative mt-8 p-5 rounded-2xl bg-forest-800/20 border border-forest-700/15 flex items-start gap-4">
+        <div class="relative mt-6 p-5 rounded-2xl bg-forest-800/20 border border-forest-700/15 flex items-start gap-4">
           <div class="w-10 h-10 rounded-full bg-forest-glow/20 flex items-center justify-center shrink-0 mt-0.5">
             <span class="text-lg">🧠</span>
           </div>
           <div>
             <p class="text-forest-glow text-xs font-semibold uppercase tracking-wider mb-1">AI Insight</p>
-            <p class="text-forest-200/70 text-sm leading-relaxed">Your sleep quality improved by 12% compared to yesterday. Keep up the evening routine — it's working!</p>
+            <p id="dash-insight" class="text-forest-200/70 text-sm leading-relaxed">Scan your first meal to start seeing insights here.</p>
           </div>
         </div>
       </div>
@@ -2124,7 +2205,19 @@ tailwind.config = {
 
 <!-- ==================== COACH DIALOG (white / Apple-clinical) ==================== -->
 <dialog id="coach-dialog" class="coach-dialog" aria-labelledby="coach-title">
-  <div class="coach-shell">
+  <div class="coach-shell" style="position: relative;">
+    <!-- Login gate (shown only when signed out) -->
+    <div class="coach-gate" aria-hidden="false">
+      <div class="coach-gate-card">
+        <div class="coach-gate-icon">🌿</div>
+        <p class="coach-gate-title">Sign in to chat with your AI Coach</p>
+        <p class="coach-gate-sub">Your conversations save securely and follow you across devices. We use Google sign-in — no password to remember.</p>
+        <button type="button" data-auth-action="signin" class="coach-gate-btn">
+          <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.5-5.2l-6.2-5.2c-2.1 1.5-4.6 2.4-7.3 2.4-5.2 0-9.6-3.3-11.2-8l-6.5 5C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C40.9 35.5 44 30.2 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+          Sign in with Google
+        </button>
+      </div>
+    </div>
     <!-- Header -->
     <div class="coach-header">
       <div class="coach-title-wrap">
@@ -2308,6 +2401,7 @@ tailwind.config = {
     if (desktop) desktop.innerHTML = user ? signedInHTML(user) : signedOutHTML;
     if (mobile)  mobile.innerHTML  = user ? signedInHTML(user) : signedOutHTML;
     document.body.dataset.authed = user ? 'true' : 'false';
+    try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
   };
 
   const signIn = async () => {
@@ -3461,6 +3555,306 @@ const SANJEEVANI_COACH_SYNC = (() => {
 
   return { _pull: pullFromCloud, _push: syncDirtyConversations };
 })();
+
+
+/* ==================== SANJEEVANI MEAL SYNC (Supabase) ==================== */
+const SANJEEVANI_MEAL_SYNC = (() => {
+  const TABLE = 'meals';
+  const SCHEMA = 'sanjeevani';
+  let currentUserId = null;
+  const pushedIds = new Set();
+
+  const sb = () => window.SANJEEVANI_SB;
+  const table = () => sb().schema(SCHEMA).from(TABLE);
+
+  function isUuid(v) {
+    return typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+  }
+
+  function rowToLocal(r) {
+    return {
+      id: r.id,
+      name: r.name,
+      calories_kcal: r.calories_kcal || 0,
+      carbs_g: r.carbs_g || 0,
+      fiber_g: r.fiber_g || 0,
+      protein_g: r.protein_g || 0,
+      fats_g: r.fats_g || 0,
+      saturated_fats_g: r.saturated_fats_g || 0,
+      verdict: r.verdict,
+      suggestion: r.suggestion || '',
+      timestamp: new Date(r.created_at).getTime(),
+    };
+  }
+
+  function localToRow(m) {
+    return {
+      id: m.id,
+      user_id: currentUserId,
+      name: m.name || 'Meal',
+      calories_kcal: Math.round(m.calories_kcal || 0),
+      carbs_g: Math.round(m.carbs_g || 0),
+      fiber_g: Math.round(m.fiber_g || 0),
+      protein_g: Math.round(m.protein_g || 0),
+      fats_g: Math.round(m.fats_g || 0),
+      saturated_fats_g: Math.round(m.saturated_fats_g || 0),
+      verdict: ['Healthy','Moderate','Indulgent'].includes(m.verdict) ? m.verdict : null,
+      suggestion: (m.suggestion || '').slice(0, 500),
+      created_at: new Date(m.timestamp || Date.now()).toISOString(),
+    };
+  }
+
+  async function pullFromCloud() {
+    if (!currentUserId) return;
+    const { data, error } = await table()
+      .select('*')
+      .eq('user_id', currentUserId)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) { console.error('[MealSync] pull error:', error); return; }
+    const cloudMeals = (data || []).map(rowToLocal);
+    const local = SANJEEVANI.loadState();
+    SANJEEVANI.patchState({ meals: cloudMeals, lastMeal: cloudMeals[0] || null });
+    for (const m of cloudMeals) pushedIds.add(m.id);
+    try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
+  }
+
+  async function pushMeal(meal) {
+    if (!currentUserId || !meal || !isUuid(meal.id)) return;
+    if (pushedIds.has(meal.id)) return;
+    const { error } = await table().upsert(localToRow(meal), { onConflict: 'id' });
+    if (error) { console.error('[MealSync] push error:', error); return; }
+    pushedIds.add(meal.id);
+  }
+
+  function wrapLogMeal() {
+    if (!window.SANJEEVANI || SANJEEVANI._mealSyncWrapped) return;
+    const orig = SANJEEVANI.logMeal;
+    SANJEEVANI.logMeal = (meal) => {
+      const logged = orig(meal);
+      pushMeal(logged);
+      try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
+      return logged;
+    };
+    SANJEEVANI._mealSyncWrapped = true;
+  }
+
+  async function onSignIn(userId) {
+    currentUserId = userId;
+    await pullFromCloud();
+  }
+
+  function onSignOut() {
+    currentUserId = null;
+    pushedIds.clear();
+  }
+
+  function init() {
+    if (!sb()) return;
+    wrapLogMeal();
+    sb().auth.getSession().then(({ data }) => {
+      const uid = data.session?.user?.id;
+      if (uid) onSignIn(uid);
+    });
+    sb().auth.onAuthStateChange((event, session) => {
+      const uid = session?.user?.id;
+      if (uid && uid !== currentUserId) onSignIn(uid);
+      else if (!uid && currentUserId) onSignOut();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  return { _pull: pullFromCloud };
+})();
+
+
+/* ==================== SANJEEVANI DASHBOARD (real user data) ==================== */
+const SANJEEVANI_DASH = (() => {
+  const $ = (id) => document.getElementById(id);
+
+  function todayMeals(meals) {
+    const today = new Date().toDateString();
+    return (meals || []).filter(m => new Date(m.timestamp).toDateString() === today);
+  }
+
+  function sum(arr, key) {
+    return Math.round(arr.reduce((a, m) => a + (Number(m[key]) || 0), 0));
+  }
+
+  function computeStreak(meals) {
+    if (!meals || meals.length === 0) return 0;
+    const days = new Set(meals.map(m => new Date(m.timestamp).toDateString()));
+    let streak = 0;
+    const cursor = new Date();
+    while (days.has(cursor.toDateString())) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  }
+
+  function greeting() {
+    const h = new Date().getHours();
+    if (h < 5) return 'Hello,';
+    if (h < 12) return 'Good morning,';
+    if (h < 17) return 'Good afternoon,';
+    if (h < 21) return 'Good evening,';
+    return 'Hello,';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  function timeAgo(ts) {
+    const s = (Date.now() - ts) / 1000;
+    if (s < 60) return 'just now';
+    if (s < 3600) return Math.floor(s/60) + 'm ago';
+    if (s < 86400) return Math.floor(s/3600) + 'h ago';
+    const d = Math.floor(s/86400);
+    return d === 1 ? 'yesterday' : d + 'd ago';
+  }
+
+  function buildInsight(today, allMeals) {
+    if (today.length === 0) {
+      return allMeals.length === 0
+        ? 'Scan your first meal with the Food Scanner to start tracking your nutrition — you\'ll see real insights here.'
+        : 'No meals logged yet today. A balanced breakfast within 2 hours of waking sets up your blood sugar for the day.';
+    }
+    const kcal = sum(today, 'calories_kcal');
+    const protein = sum(today, 'protein_g');
+    if (protein < 20) return `You're at ${protein}g protein today — most adults need 50-80g daily. Add paneer, dal, eggs, or chicken to your next meal.`;
+    if (kcal > 2200) return `You're at ${kcal} kcal today — slightly higher than typical needs. A 20-minute walk after your next meal would balance it out.`;
+    if (kcal < 800 && today.length >= 1) return `${kcal} kcal so far feels low. Don't skip — your body works best with steady fuel through the day.`;
+    return `${today.length} meal${today.length>1?'s':''}, ${kcal} kcal, ${protein}g protein today. You're on track — keep it steady.`;
+  }
+
+  function render() {
+    const dash = $('dashboard');
+    if (!dash) return;
+
+    const state = SANJEEVANI.loadState();
+    const meals = state.meals || [];
+    const today = todayMeals(meals);
+    const user = window.SANJEEVANI_SB ? null : null; // placeholder
+    let displayName = 'Friend';
+    let signedIn = document.body.dataset.authed === 'true';
+
+    if (signedIn && window.SANJEEVANI_SB) {
+      window.SANJEEVANI_SB.auth.getSession().then(({ data }) => {
+        const u = data.session?.user;
+        if (u) {
+          const n = u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'Friend';
+          const firstName = n.split(' ')[0];
+          const nameEl = $('dash-name');
+          if (nameEl) nameEl.textContent = `${firstName}! 👋`;
+        }
+      });
+    }
+
+    const kcal = sum(today, 'calories_kcal');
+    const protein = sum(today, 'protein_g');
+    const carbs = sum(today, 'carbs_g');
+    const fats = sum(today, 'fats_g');
+    const fiber = sum(today, 'fiber_g');
+
+    const KCAL_TARGET = 2000;
+    const PROTEIN_TARGET = 60;
+    const FIBER_TARGET = 30;
+
+    const healthScore = (() => {
+      if (today.length === 0) return signedIn ? 0 : 86;
+      let s = 50;
+      s += Math.min(20, (protein / PROTEIN_TARGET) * 20);
+      s += Math.min(15, (fiber / FIBER_TARGET) * 15);
+      const kcalRatio = kcal / KCAL_TARGET;
+      if (kcalRatio > 0.6 && kcalRatio < 1.2) s += 15;
+      const healthyCount = today.filter(m => m.verdict === 'Healthy').length;
+      s += Math.min(10, healthyCount * 5);
+      const indulgent = today.filter(m => m.verdict === 'Indulgent').length;
+      s -= indulgent * 5;
+      return Math.max(0, Math.min(100, Math.round(s)));
+    })();
+
+    const scoreLabel = healthScore >= 85 ? 'Excellent' : healthScore >= 70 ? 'Great' : healthScore >= 50 ? 'Good' : healthScore > 0 ? 'Keep going' : 'Start scanning';
+
+    const updates = {
+      'dash-greeting': greeting(),
+      'dash-score': String(healthScore),
+      'dash-score-label': scoreLabel,
+      'dash-score-sub': signedIn
+        ? (meals.length === 0 ? 'Scan a meal to start your score' : `Based on ${today.length} meal${today.length===1?'':'s'} today`)
+        : 'Sign in to see your real score',
+      'dash-streak-value': String(computeStreak(meals)),
+      'dash-kcal-value': String(kcal),
+      'dash-kcal-sub': `/${KCAL_TARGET} kcal`,
+      'dash-protein-value': `${protein}g`,
+      'dash-protein-sub': `/${PROTEIN_TARGET}g`,
+      'dash-fiber-value': `${fiber}g`,
+      'dash-fiber-sub': `/${FIBER_TARGET}g`,
+      'dash-insight': buildInsight(today, meals),
+    };
+    for (const [id, val] of Object.entries(updates)) {
+      const el = $(id);
+      if (el) el.textContent = val;
+    }
+
+    // progress bars
+    const setBar = (id, pct) => { const b = $(id); if (b) b.style.width = Math.min(100, Math.max(0, pct)) + '%'; };
+    setBar('dash-kcal-bar', (kcal / KCAL_TARGET) * 100);
+    setBar('dash-protein-bar', (protein / PROTEIN_TARGET) * 100);
+    setBar('dash-fiber-bar', (fiber / FIBER_TARGET) * 100);
+    const ring = $('dash-score-ring');
+    if (ring) {
+      const circumference = 2 * Math.PI * 54;
+      ring.style.strokeDasharray = String(circumference);
+      ring.style.strokeDashoffset = String(circumference * (1 - healthScore / 100));
+    }
+
+    const list = $('dash-recent-meals');
+    if (list) {
+      const recent = meals.slice(0, 4);
+      if (recent.length === 0) {
+        list.innerHTML = `<p class="text-forest-300/40 text-sm italic">No meals logged yet. Tap <button class="text-forest-glow underline" onclick="SANJEEVANI.openScanner()">Food Scanner</button> to add your first.</p>`;
+      } else {
+        list.innerHTML = recent.map(m => {
+          const verdictColor = m.verdict === 'Healthy' ? 'text-forest-glow' : m.verdict === 'Moderate' ? 'text-yellow-300' : 'text-orange-400';
+          return `<div class="flex items-center justify-between py-2 border-b border-forest-700/10 last:border-0">
+            <div class="min-w-0 flex-1">
+              <p class="text-forest-100 text-sm font-medium truncate">${escapeHtml(m.name || 'Meal')}</p>
+              <p class="text-forest-400/40 text-xs">${timeAgo(m.timestamp)} · ${m.calories_kcal||0} kcal · ${m.protein_g||0}g P</p>
+            </div>
+            ${m.verdict ? `<span class="${verdictColor} text-xs font-semibold ml-3 shrink-0">${m.verdict}</span>` : ''}
+          </div>`;
+        }).join('');
+      }
+    }
+
+    const gate = $('dash-signin-gate');
+    if (gate) gate.style.display = signedIn ? 'none' : '';
+  }
+
+  function init() {
+    if (!$('dashboard')) return;
+    render();
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+    setInterval(render, 30000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  return { render };
+})();
+window.SANJEEVANI_DASH = SANJEEVANI_DASH;
 
 
 /* ==================== SANJEEVANI WAITLIST ENGINE ==================== */
