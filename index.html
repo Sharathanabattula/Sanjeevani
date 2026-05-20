@@ -2264,6 +2264,8 @@ const SANJEEVANI = (() => {
   const STORAGE_KEY = 'sanjeevani.state.v1';
   const MAX_IMAGE_DIM = 1024;
   const JPEG_QUALITY = 0.85;
+  // If no client-side key, route through the Vercel serverless proxy (production path).
+  const USE_PROXY = !GEMINI_API_KEY;
 
   // ---- State (localStorage) ----
   const defaultState = { meals: [], water_ml: 0, steps: 0, weight_kg: null, challenges: {}, lastMeal: null };
@@ -2456,6 +2458,24 @@ If the image is not food, return {"error": "not_food"}.`;
 
   async function analyzeWithGemini(dataUrl) {
     const base64 = dataUrl.split(',')[1];
+
+    // Production path: proxy through /api/gemini-vision (server holds the key).
+    if (USE_PROXY) {
+      const res = await fetch('/api/gemini-vision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_base64: base64, mime_type: 'image/jpeg' }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        if (err.error === 'not_food') throw new Error('That doesn\'t look like food. Try a clearer photo of your meal.');
+        throw new Error(err.detail || `Vision API ${res.status}`);
+      }
+      // The proxy already returns the normalized shape.
+      return await res.json();
+    }
+
+    // Dev path: call Gemini directly with the local key.
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
     const body = {
       contents: [{
@@ -2596,9 +2616,10 @@ If the image is not food, return {"error": "not_food"}.`;
   async function runAnalyze() {
     if (!capturedDataUrl) return;
     setAnalyzing(true);
-    setStatus(GEMINI_API_KEY ? 'Sending to Gemini Vision…' : 'No API key — running demo analysis…', '');
+    const useAI = GEMINI_API_KEY || USE_PROXY;
+    setStatus(useAI ? 'Sending to Gemini Vision…' : 'No API key — running demo analysis…', '');
     try {
-      const meal = GEMINI_API_KEY ? await analyzeWithGemini(capturedDataUrl) : await new Promise(r => setTimeout(() => r(demoAnalyze()), 900));
+      const meal = useAI ? await analyzeWithGemini(capturedDataUrl) : await new Promise(r => setTimeout(() => r(demoAnalyze()), 900));
       meal.imageDataUrl = capturedDataUrl;
       const saved = logMeal(meal);
       renderMeal(saved, capturedDataUrl);
@@ -2726,8 +2747,11 @@ const SANJEEVANI_COACH = (() => {
   const cfg = (typeof window !== 'undefined' && window.SANJEEVANI_CONFIG) || {};
   const API_KEY = cfg.geminiApiKey || '';
   const MODEL = cfg.geminiModel || 'gemini-flash-latest';
+  // If no local key, use the server-side proxy (production path).
+  const USE_PROXY = !API_KEY;
   const STREAM_URL = (key) =>
     `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:streamGenerateContent?alt=sse&key=${encodeURIComponent(key)}`;
+  const PROXY_URL = '/api/gemini-chat';
   const MAX_CONVERSATIONS = 5;
   const MAX_MSGS_PER_CONV = 40;
 
@@ -2968,8 +2992,8 @@ If the user references "my meal" or "today" without specifics, use this context.
 
     setSending(true);
 
-    if (!API_KEY) {
-      // Demo fallback
+    if (!API_KEY && !USE_PROXY) {
+      // Demo fallback (truly no AI configured at all)
       setTimeout(() => {
         const fake = `I'd love to give you a real answer, but no Gemini API key is configured. Drop one in \`config.local.js\` and I'll stream live replies grounded in your meals.
 
@@ -2983,26 +3007,38 @@ Try this in the meantime: drink a glass of water and take 10 slow breaths.`;
       inflightAbort = new AbortController();
       const { coach } = loadCoachState();
       const conv = coach.conversations.find(c => c.id === coach.activeId);
-      const history = (conv?.messages || [])
-        .slice(0, -1) // drop the empty model placeholder we just appended
-        .map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
+      const history = (conv?.messages || []).slice(0, -1); // drop empty placeholder
 
-      const body = {
-        systemInstruction: { parts: [{ text: buildSystemInstruction() }] },
-        contents: history,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 800,
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      };
-
-      const res = await fetch(STREAM_URL(API_KEY), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        signal: inflightAbort.signal,
-      });
+      let res;
+      if (USE_PROXY) {
+        // Production path: server-side proxy, key stays on Vercel
+        res = await fetch(PROXY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: history.map(m => ({ role: m.role, text: m.text })),
+            systemInstruction: buildSystemInstruction(),
+          }),
+          signal: inflightAbort.signal,
+        });
+      } else {
+        // Dev path: direct call to Gemini with local key
+        const body = {
+          systemInstruction: { parts: [{ text: buildSystemInstruction() }] },
+          contents: history.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] })),
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 800,
+            thinkingConfig: { thinkingBudget: 0 },
+          },
+        };
+        res = await fetch(STREAM_URL(API_KEY), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: inflightAbort.signal,
+        });
+      }
       if (!res.ok) {
         const errText = await res.text().catch(() => '');
         throw new Error(`Gemini ${res.status}: ${errText.slice(0, 200)}`);
