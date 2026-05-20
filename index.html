@@ -488,6 +488,219 @@ tailwind.config = {
     transition: transform 0.15s ease;
   }
   .coach-gate-btn:hover { transform: translateY(-1px); }
+
+  /* ---- Profile modal ---- */
+  .profile-dialog {
+    background: transparent;
+    border: none;
+    padding: 0;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100%;
+    height: 100%;
+    color: #f0f5f1;
+  }
+  .profile-dialog::backdrop {
+    background: rgba(10, 18, 12, 0.65);
+    backdrop-filter: blur(14px);
+  }
+  .profile-shell {
+    max-width: 560px;
+    margin: 5vh auto 3vh;
+    background: linear-gradient(180deg, #131c14 0%, #0d150e 100%);
+    border: 1px solid rgba(76, 175, 80, 0.20);
+    border-radius: 22px;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(76, 175, 80, 0.08) inset;
+    overflow: hidden;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .profile-header {
+    padding: 22px 24px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(76, 175, 80, 0.10);
+  }
+  .profile-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .profile-header p {
+    color: rgba(220, 240, 224, 0.55);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  .profile-close {
+    width: 32px; height: 32px;
+    border-radius: 999px;
+    background: rgba(76, 175, 80, 0.10);
+    color: #b3d7b7;
+    border: 1px solid rgba(76, 175, 80, 0.15);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .profile-close:hover { background: rgba(76, 175, 80, 0.20); color: #fff; }
+  .profile-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+  }
+  .profile-section { margin-bottom: 24px; }
+  .profile-section:last-child { margin-bottom: 0; }
+  .profile-label {
+    color: rgba(220, 240, 224, 0.55);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .profile-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background: rgba(76, 175, 80, 0.06);
+    border-radius: 14px;
+    border: 1px solid rgba(76, 175, 80, 0.12);
+  }
+  .profile-identity img, .profile-identity .pi-fallback {
+    width: 48px; height: 48px;
+    border-radius: 999px;
+    object-fit: cover;
+    background: #2e7d32;
+    color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .profile-identity .pi-meta {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .profile-identity .pi-name {
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .profile-identity .pi-email {
+    color: rgba(220, 240, 224, 0.50);
+    font-size: 12px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .profile-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .profile-chip {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(76, 175, 80, 0.06);
+    color: rgba(220, 240, 224, 0.75);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid rgba(76, 175, 80, 0.14);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .profile-chip:hover { background: rgba(76, 175, 80, 0.14); }
+  .profile-chip.active {
+    background: linear-gradient(135deg, #1B5E20, #2E7D32);
+    color: #fff;
+    border-color: rgba(0, 230, 118, 0.40);
+    box-shadow: 0 4px 14px -4px rgba(76, 175, 80, 0.40);
+  }
+  .profile-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: rgba(76, 175, 80, 0.06);
+    border-radius: 14px;
+    border: 1px solid rgba(76, 175, 80, 0.12);
+  }
+  .profile-toggle-row .ptr-label { font-weight: 500; color: #f0f5f1; font-size: 14px; }
+  .profile-toggle-row .ptr-sub { color: rgba(220, 240, 224, 0.50); font-size: 12px; margin-top: 2px; }
+  .profile-switch {
+    position: relative;
+    width: 44px; height: 24px;
+    border-radius: 999px;
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.20);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+  }
+  .profile-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    border-radius: 999px;
+    background: #fff;
+    transition: transform 0.2s ease;
+  }
+  .profile-switch.on { background: linear-gradient(135deg, #1B5E20, #4CAF50); }
+  .profile-switch.on::after { transform: translateX(20px); }
+  .profile-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(76, 175, 80, 0.10);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    background: rgba(10, 18, 12, 0.4);
+  }
+  .profile-btn {
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+  }
+  .profile-btn-secondary {
+    background: rgba(76, 175, 80, 0.10);
+    color: #d0e8d3;
+    border-color: rgba(76, 175, 80, 0.18);
+  }
+  .profile-btn-secondary:hover { background: rgba(76, 175, 80, 0.18); }
+  .profile-btn-primary {
+    background: linear-gradient(135deg, #1B5E20, #2E7D32);
+    color: #fff;
+    box-shadow: 0 6px 18px -6px rgba(76, 175, 80, 0.5);
+  }
+  .profile-btn-primary:hover { transform: translateY(-1px); }
+  .profile-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .profile-saved-toast {
+    position: absolute;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 230, 118, 0.15);
+    color: #b8f1c5;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid rgba(0, 230, 118, 0.30);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .profile-saved-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .coach-dialog::backdrop {
     background: rgba(20, 20, 25, 0.55);
     backdrop-filter: blur(18px);
@@ -1343,7 +1556,7 @@ tailwind.config = {
         </div>
 
         <!-- Header -->
-        <div class="relative flex items-center justify-between mb-8">
+        <div class="relative flex items-center justify-between mb-6 flex-wrap gap-3">
           <div>
             <p id="dash-greeting" class="text-forest-300/60 text-sm">Good morning,</p>
             <h3 id="dash-name" class="font-display font-bold text-2xl text-white">Friend! 👋</h3>
@@ -1352,6 +1565,12 @@ tailwind.config = {
             <p class="text-forest-300/50 text-xs uppercase tracking-wider">Streak</p>
             <p class="font-display font-bold text-2xl text-forest-glow"><span id="dash-streak-value">0</span> 🔥</p>
           </div>
+        </div>
+        <!-- Active goals row -->
+        <div id="dash-goals-row" class="relative -mt-2 mb-6 flex flex-wrap items-center gap-2" style="display:none">
+          <span class="text-forest-300/50 text-xs uppercase tracking-wider mr-1">Goals:</span>
+          <span id="dash-goals-chips" class="flex flex-wrap gap-1.5"></span>
+          <button type="button" data-profile-open="true" class="text-forest-glow/70 hover:text-forest-glow text-xs underline ml-1">edit</button>
         </div>
 
         <!-- Health Score + Stats Grid -->
@@ -2269,6 +2488,95 @@ tailwind.config = {
 </dialog>
 
 
+<!-- ==================== PROFILE DIALOG ==================== -->
+<dialog id="profile-dialog" class="profile-dialog" aria-labelledby="profile-title">
+  <div class="profile-shell">
+    <div class="profile-saved-toast" id="profile-saved-toast">✓ Saved</div>
+
+    <div class="profile-header">
+      <div>
+        <h2 id="profile-title">Your profile</h2>
+        <p>Helps your AI Coach personalize advice</p>
+      </div>
+      <button id="profile-close-btn" type="button" class="profile-close" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="profile-body">
+      <!-- Identity (read-only) -->
+      <div class="profile-section">
+        <div class="profile-label"><span>Account</span></div>
+        <div id="profile-identity" class="profile-identity">
+          <div class="pi-fallback">?</div>
+          <div class="pi-meta">
+            <div class="pi-name">Loading…</div>
+            <div class="pi-email">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Goals -->
+      <div class="profile-section">
+        <div class="profile-label">
+          <span>🎯 Health goals</span>
+          <span style="opacity: 0.5; font-weight: 400; text-transform: none; letter-spacing: 0;">(pick any)</span>
+        </div>
+        <div id="profile-goals" class="profile-chips" data-field="goals">
+          <button type="button" class="profile-chip" data-value="lose_weight">Lose weight</button>
+          <button type="button" class="profile-chip" data-value="gain_muscle">Gain muscle</button>
+          <button type="button" class="profile-chip" data-value="more_protein">More protein</button>
+          <button type="button" class="profile-chip" data-value="less_sugar">Less sugar</button>
+          <button type="button" class="profile-chip" data-value="more_energy">More energy</button>
+          <button type="button" class="profile-chip" data-value="better_sleep">Better sleep</button>
+          <button type="button" class="profile-chip" data-value="heart_health">Heart health</button>
+          <button type="button" class="profile-chip" data-value="reduce_belly_fat">Reduce belly fat</button>
+          <button type="button" class="profile-chip" data-value="stress_less">Stress less</button>
+        </div>
+      </div>
+
+      <!-- Conditions -->
+      <div class="profile-section">
+        <div class="profile-label">
+          <span>🩺 Health conditions</span>
+          <span style="opacity: 0.5; font-weight: 400; text-transform: none; letter-spacing: 0;">(if any)</span>
+        </div>
+        <div id="profile-conditions" class="profile-chips" data-field="conditions">
+          <button type="button" class="profile-chip" data-value="diabetes">Diabetes / Pre-diabetes</button>
+          <button type="button" class="profile-chip" data-value="high_bp">High blood pressure</button>
+          <button type="button" class="profile-chip" data-value="high_cholesterol">High cholesterol</button>
+          <button type="button" class="profile-chip" data-value="thyroid">Thyroid</button>
+          <button type="button" class="profile-chip" data-value="pcos">PCOS / PCOD</button>
+          <button type="button" class="profile-chip" data-value="digestion">Digestion / IBS</button>
+          <button type="button" class="profile-chip" data-value="pregnant">Pregnant</button>
+          <button type="button" class="profile-chip" data-value="breastfeeding">Breastfeeding</button>
+        </div>
+        <p style="color: rgba(220,240,224,0.40); font-size: 11px; margin-top: 10px; line-height: 1.5;">
+          Used only to tailor your AI Coach's advice. Never shared. The coach is not a substitute for a doctor.
+        </p>
+      </div>
+
+      <!-- Diet preference -->
+      <div class="profile-section">
+        <div class="profile-label"><span>🥬 Diet preference</span></div>
+        <div class="profile-toggle-row">
+          <div>
+            <div class="ptr-label">Vegetarian</div>
+            <div class="ptr-sub">Coach will skip meat/fish suggestions</div>
+          </div>
+          <button id="profile-veg-switch" type="button" class="profile-switch" aria-pressed="false" aria-label="Toggle vegetarian"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-footer">
+      <button id="profile-cancel-btn" type="button" class="profile-btn profile-btn-secondary">Cancel</button>
+      <button id="profile-save-btn" type="button" class="profile-btn profile-btn-primary">Save</button>
+    </div>
+  </div>
+</dialog>
+
+
 <!-- ==================== SCANNER DIALOG ==================== -->
 <dialog id="sj-scanner-dialog" class="sj-dialog" aria-labelledby="sj-scanner-title">
   <div class="sj-dialog-shell">
@@ -2388,8 +2696,10 @@ tailwind.config = {
       : `<div class="w-8 h-8 rounded-full bg-forest-600 text-white text-sm font-semibold flex items-center justify-center ring-2 ring-forest-500/40">${initial}</div>`;
     return `
       <div class="flex items-center gap-3">
-        ${avatarEl}
-        <span class="hidden lg:inline text-forest-100 text-sm font-medium max-w-[140px] truncate">${name}</span>
+        <button type="button" data-profile-open="true" class="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-forest-800/30 transition" title="Open profile">
+          ${avatarEl}
+          <span class="hidden lg:inline text-forest-100 text-sm font-medium max-w-[140px] truncate">${name}</span>
+        </button>
         <button type="button" data-auth-action="signout" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-forest-100 bg-forest-800/40 hover:bg-forest-700/60 border border-forest-700/40 transition">Sign out</button>
       </div>`;
   };
@@ -3029,6 +3339,25 @@ const SANJEEVANI_COACH = (() => {
       ? meals.map(m => `  - ${m.name} (${m.calories_kcal}kcal, ${m.protein_g}g P / ${m.carbs_g}g C / ${m.fats_g}g F, ${m.verdict}) on ${new Date(m.timestamp).toLocaleDateString()}`).join('\n')
       : '  (no meals logged yet)';
 
+    const profile = s.profile || {};
+    const goalLabels = window.SANJEEVANI_PROFILE?._GOAL_LABELS || {};
+    const condLabels = window.SANJEEVANI_PROFILE?._CONDITION_LABELS || {};
+    const goalText = (profile.goals || []).map(g => goalLabels[g] || g).filter(Boolean).join(', ');
+    const condText = (profile.conditions || []).map(c => condLabels[c] || c).filter(Boolean).join(', ');
+    const dietText = profile.is_vegetarian === true ? 'vegetarian'
+      : profile.is_vegetarian === false ? 'eats meat/fish' : 'unspecified';
+
+    const profileBlock = (goalText || condText || profile.is_vegetarian !== null && profile.is_vegetarian !== undefined)
+      ? `USER PROFILE (use this to personalize every reply):
+- Goals: ${goalText || '(none set)'}
+- Health conditions: ${condText || '(none reported)'}
+- Diet: ${dietText}
+
+`
+      : `USER PROFILE: not set yet. Gently suggest they set their goals in the profile menu (top-right avatar) when relevant.
+
+`;
+
     return `You are Sanjeevani, an AI health coach for users in India and the Indian diaspora.
 
 Personality: Warm, precise, never preachy. Speak like a smart friend who happens to be a registered dietitian. Code-switch into Hindi / Tamil / Telugu / Bengali words ONLY when it genuinely helps (food names, cultural context) — never to seem trendy.
@@ -3037,19 +3366,19 @@ Rules:
 - Default response length: 2-4 short sentences. Use bullet points only when listing 3+ items.
 - Ground every claim in the user's logged data when relevant. Cite numbers ("you've had ~${todaysKcal} kcal today").
 - End most replies with ONE concrete, doable next step the user can take in the next hour.
+- Tailor advice to the user's GOALS and CONDITIONS below. If they have diabetes, prioritize low-GI suggestions. If they're pregnant, emphasize iron + folate. If they're vegetarian, never suggest meat/fish — use paneer, dal, eggs (if not stated otherwise), soy, tofu, hemp.
 - If the user asks for medical diagnosis or prescription advice, recommend they consult a doctor — do not diagnose.
 - Never recommend extreme diets, fasting longer than 18h, or extreme cardio.
 - If the user logs something concerning (very low calories, signs of an eating disorder, suicidal ideation), respond with care and recommend professional help (e.g. iCall India 9152987821).
-- Respect vegetarian / Jain / halal preferences if the user mentions them.
 
-USER CONTEXT (from local app data, today is ${today}):
+${profileBlock}USER CONTEXT (from app data, today is ${today}):
 - Recent meals (most recent first):
 ${mealLines}
 - Today so far: ${todaysMeals.length} meals, ~${todaysKcal} kcal, ${todaysProtein}g protein
 - Water logged today: ${s.water_ml || 0} ml
 - Steps today: ${s.steps || 0}
 
-If the user references "my meal" or "today" without specifics, use this context.`;
+If the user references "my meal" or "today" without specifics, use the meal context above.`;
   }
 
   // ---- Render ----
@@ -3673,6 +4002,206 @@ const SANJEEVANI_MEAL_SYNC = (() => {
 })();
 
 
+/* ==================== SANJEEVANI PROFILE (goals + conditions + diet) ==================== */
+const SANJEEVANI_PROFILE = (() => {
+  const TABLE = 'profiles';
+  const SCHEMA = 'sanjeevani';
+
+  const GOAL_LABELS = {
+    lose_weight: 'lose weight',
+    gain_muscle: 'gain muscle',
+    more_protein: 'eat more protein',
+    less_sugar: 'cut down on sugar',
+    more_energy: 'have more daily energy',
+    better_sleep: 'sleep better',
+    heart_health: 'improve heart health',
+    reduce_belly_fat: 'reduce belly fat',
+    stress_less: 'manage stress better',
+  };
+  const CONDITION_LABELS = {
+    diabetes: 'diabetes / pre-diabetes',
+    high_bp: 'high blood pressure',
+    high_cholesterol: 'high cholesterol',
+    thyroid: 'thyroid condition',
+    pcos: 'PCOS / PCOD',
+    digestion: 'digestion issues / IBS',
+    pregnant: 'currently pregnant',
+    breastfeeding: 'currently breastfeeding',
+  };
+
+  let currentUserId = null;
+  let currentUserMeta = null;
+  let cachedProfile = { goals: [], conditions: [], is_vegetarian: null };
+
+  const sb = () => window.SANJEEVANI_SB;
+  const $ = (id) => document.getElementById(id);
+
+  async function pull() {
+    if (!currentUserId) return;
+    const { data, error } = await sb().schema(SCHEMA).from(TABLE)
+      .select('goals, conditions, is_vegetarian, full_name, avatar_url')
+      .eq('id', currentUserId)
+      .maybeSingle();
+    if (error) { console.error('[Profile] pull error:', error); return; }
+    cachedProfile = {
+      goals: Array.isArray(data?.goals) ? data.goals : [],
+      conditions: Array.isArray(data?.conditions) ? data.conditions : [],
+      is_vegetarian: typeof data?.is_vegetarian === 'boolean' ? data.is_vegetarian : null,
+    };
+    SANJEEVANI.patchState({ profile: cachedProfile });
+    try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
+  }
+
+  async function save(values) {
+    if (!currentUserId) return false;
+    const payload = {
+      id: currentUserId,
+      goals: values.goals || [],
+      conditions: values.conditions || [],
+      is_vegetarian: typeof values.is_vegetarian === 'boolean' ? values.is_vegetarian : null,
+      email: currentUserMeta?.email || null,
+      full_name: currentUserMeta?.user_metadata?.full_name || currentUserMeta?.user_metadata?.name || null,
+      avatar_url: currentUserMeta?.user_metadata?.avatar_url || currentUserMeta?.user_metadata?.picture || null,
+    };
+    const { error } = await sb().schema(SCHEMA).from(TABLE).upsert(payload, { onConflict: 'id' });
+    if (error) { console.error('[Profile] save error:', error); return false; }
+    cachedProfile = { goals: payload.goals, conditions: payload.conditions, is_vegetarian: payload.is_vegetarian };
+    SANJEEVANI.patchState({ profile: cachedProfile });
+    try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
+    return true;
+  }
+
+  function readUiValues() {
+    const goals = Array.from(document.querySelectorAll('#profile-goals .profile-chip.active')).map(c => c.dataset.value);
+    const conditions = Array.from(document.querySelectorAll('#profile-conditions .profile-chip.active')).map(c => c.dataset.value);
+    const veg = $('profile-veg-switch')?.classList.contains('on') || false;
+    return { goals, conditions, is_vegetarian: veg };
+  }
+
+  function writeUiValues(p) {
+    document.querySelectorAll('#profile-goals .profile-chip').forEach(c => {
+      c.classList.toggle('active', (p.goals || []).includes(c.dataset.value));
+    });
+    document.querySelectorAll('#profile-conditions .profile-chip').forEach(c => {
+      c.classList.toggle('active', (p.conditions || []).includes(c.dataset.value));
+    });
+    const sw = $('profile-veg-switch');
+    if (sw) {
+      const on = p.is_vegetarian === true;
+      sw.classList.toggle('on', on);
+      sw.setAttribute('aria-pressed', String(on));
+    }
+  }
+
+  function renderIdentity() {
+    const wrap = $('profile-identity');
+    if (!wrap || !currentUserMeta) return;
+    const name = currentUserMeta.user_metadata?.full_name || currentUserMeta.user_metadata?.name || currentUserMeta.email || 'Account';
+    const email = currentUserMeta.email || '';
+    const avatar = currentUserMeta.user_metadata?.avatar_url || currentUserMeta.user_metadata?.picture;
+    const initial = (name[0] || '?').toUpperCase();
+    const avatarEl = avatar
+      ? `<img src="${avatar}" alt="" referrerpolicy="no-referrer">`
+      : `<div class="pi-fallback">${initial}</div>`;
+    wrap.innerHTML = `
+      ${avatarEl}
+      <div class="pi-meta">
+        <div class="pi-name">${escapeHtml(name)}</div>
+        <div class="pi-email">${escapeHtml(email)}</div>
+      </div>`;
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  function showSavedToast() {
+    const t = $('profile-saved-toast');
+    if (!t) return;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1600);
+  }
+
+  async function open() {
+    if (!currentUserId) {
+      try { window.SANJEEVANI?.toast?.('Sign in to set up your profile'); } catch (_) {}
+      return;
+    }
+    renderIdentity();
+    await pull();
+    writeUiValues(cachedProfile);
+    $('profile-dialog')?.showModal();
+  }
+
+  function close() { $('profile-dialog')?.close(); }
+
+  function bindOnce() {
+    if (bindOnce._done) return;
+    bindOnce._done = true;
+    $('profile-close-btn')?.addEventListener('click', close);
+    $('profile-cancel-btn')?.addEventListener('click', close);
+    $('profile-save-btn')?.addEventListener('click', async () => {
+      const btn = $('profile-save-btn');
+      const original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      const ok = await save(readUiValues());
+      btn.disabled = false;
+      btn.textContent = original;
+      if (ok) { showSavedToast(); setTimeout(close, 900); }
+    });
+    document.querySelectorAll('#profile-goals .profile-chip, #profile-conditions .profile-chip')
+      .forEach(c => c.addEventListener('click', () => c.classList.toggle('active')));
+    const sw = $('profile-veg-switch');
+    sw?.addEventListener('click', () => {
+      const on = !sw.classList.contains('on');
+      sw.classList.toggle('on', on);
+      sw.setAttribute('aria-pressed', String(on));
+    });
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-profile-open]');
+      if (btn) { e.preventDefault(); open(); }
+    });
+  }
+
+  function onSignIn(user) {
+    currentUserId = user.id;
+    currentUserMeta = user;
+    pull();
+  }
+
+  function onSignOut() {
+    currentUserId = null;
+    currentUserMeta = null;
+    cachedProfile = { goals: [], conditions: [], is_vegetarian: null };
+    SANJEEVANI.patchState({ profile: cachedProfile });
+  }
+
+  function init() {
+    if (!sb()) return;
+    bindOnce();
+    sb().auth.getSession().then(({ data }) => {
+      const u = data.session?.user;
+      if (u) onSignIn(u);
+    });
+    sb().auth.onAuthStateChange((_event, session) => {
+      const u = session?.user;
+      if (u && u.id !== currentUserId) onSignIn(u);
+      else if (!u && currentUserId) onSignOut();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  return { open, close, get: () => cachedProfile, _GOAL_LABELS: GOAL_LABELS, _CONDITION_LABELS: CONDITION_LABELS };
+})();
+window.SANJEEVANI_PROFILE = SANJEEVANI_PROFILE;
+
+
 /* ==================== SANJEEVANI DASHBOARD (real user data) ==================== */
 const SANJEEVANI_DASH = (() => {
   const $ = (id) => document.getElementById(id);
@@ -3837,6 +4366,22 @@ const SANJEEVANI_DASH = (() => {
 
     const gate = $('dash-signin-gate');
     if (gate) gate.style.display = signedIn ? 'none' : '';
+
+    // Active goals row
+    const goalsRow = $('dash-goals-row');
+    const goalsChips = $('dash-goals-chips');
+    const profile = state.profile || {};
+    const goalLabels = window.SANJEEVANI_PROFILE?._GOAL_LABELS || {};
+    const goals = (profile.goals || []).slice(0, 3);
+    if (signedIn && goals.length > 0 && goalsRow && goalsChips) {
+      goalsChips.innerHTML = goals.map(g => {
+        const label = (goalLabels[g] || g).replace(/^./, c => c.toUpperCase());
+        return `<span class="text-xs font-medium px-2.5 py-1 rounded-full bg-forest-glow/15 text-forest-glow border border-forest-glow/25">${escapeHtml(label)}</span>`;
+      }).join('');
+      goalsRow.style.display = '';
+    } else if (goalsRow) {
+      goalsRow.style.display = 'none';
+    }
   }
 
   function init() {
