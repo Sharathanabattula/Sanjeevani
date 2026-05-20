@@ -418,6 +418,345 @@ tailwind.config = {
   }
   .sj-toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+  /* ============================================================
+     COACH — Apple-clinical white aesthetic
+     ============================================================ */
+  .coach-dialog {
+    background: transparent;
+    border: none;
+    padding: 0;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100%;
+    height: 100%;
+    color: #1d1d1f;
+  }
+  .coach-dialog::backdrop {
+    background: rgba(20, 20, 25, 0.55);
+    backdrop-filter: blur(18px);
+  }
+  .coach-shell {
+    width: min(820px, 96vw);
+    height: min(92vh, 880px);
+    margin: max(16px, 4vh) auto;
+    background: #fbfbfd;
+    border-radius: 24px;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.04),
+      0 30px 80px -30px rgba(0, 0, 0, 0.25),
+      0 12px 40px -16px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+    color: #1d1d1f;
+  }
+  .coach-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px 14px;
+    background: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+  .coach-title-wrap { display: flex; align-items: center; gap: 12px; }
+  .coach-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1d1d1f, #3a3a3c);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: -0.02em;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+  }
+  .coach-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d1d1f;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .coach-subtitle {
+    font-size: 12px;
+    color: #6e6e73;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .coach-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #30d158;
+    box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.18);
+  }
+  .coach-icon-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: rgba(0, 0, 0, 0.02);
+    color: #1d1d1f;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .coach-icon-btn:hover { background: rgba(0, 0, 0, 0.05); }
+  .coach-icon-btn:active { transform: scale(0.95); }
+
+  .coach-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 22px 8px;
+    scroll-behavior: smooth;
+  }
+  .coach-messages::-webkit-scrollbar { width: 6px; }
+  .coach-messages::-webkit-scrollbar-track { background: transparent; }
+  .coach-messages::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+
+  .coach-msg {
+    max-width: 78%;
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+    animation: coach-fade-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes coach-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .coach-msg.user {
+    background: #1d1d1f;
+    color: #fff;
+    margin-left: auto;
+    border-bottom-right-radius: 6px;
+  }
+  .coach-msg.model {
+    background: #ffffff;
+    color: #1d1d1f;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border-bottom-left-radius: 6px;
+  }
+  .coach-msg.model strong { font-weight: 600; color: #000; }
+  .coach-msg.model em { font-style: italic; color: #424245; }
+  .coach-msg.model code {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .coach-msg.model ul, .coach-msg.model ol {
+    margin: 8px 0 8px 18px;
+    padding: 0;
+  }
+  .coach-msg.model li { margin: 3px 0; }
+  .coach-msg.model p { margin: 0; }
+  .coach-msg.model p + p { margin-top: 8px; }
+
+  .coach-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+  }
+  .coach-row.user { align-items: flex-end; }
+  .coach-row.model { align-items: flex-start; }
+  .coach-meta {
+    font-size: 11px;
+    color: #8e8e93;
+    margin: 2px 8px 12px;
+    letter-spacing: -0.005em;
+  }
+  .coach-typing-dots { display: inline-flex; gap: 4px; align-items: center; height: 18px; }
+  .coach-typing-dots span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #8e8e93;
+    animation: coach-dot 1.2s infinite ease-in-out;
+  }
+  .coach-typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .coach-typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes coach-dot {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+  .coach-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: #1d1d1f;
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    animation: coach-blink 1s steps(2) infinite;
+  }
+  @keyframes coach-blink { 50% { opacity: 0; } }
+
+  .coach-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 22px 4px;
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+  }
+  .coach-chip {
+    font-size: 12.5px;
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: #1d1d1f;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    letter-spacing: -0.005em;
+    font-weight: 500;
+  }
+  .coach-chip:hover { background: #f5f5f7; border-color: rgba(0, 0, 0, 0.14); }
+  .coach-chip:active { transform: scale(0.97); }
+
+  .coach-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 14px 22px 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    backdrop-filter: saturate(180%) blur(20px);
+  }
+  .coach-textarea-wrap {
+    flex: 1;
+    position: relative;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 22px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .coach-textarea-wrap:focus-within {
+    border-color: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+  }
+  .coach-textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    resize: none;
+    padding: 12px 16px;
+    font-family: inherit;
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: #1d1d1f;
+    max-height: 140px;
+    min-height: 44px;
+  }
+  .coach-textarea::placeholder { color: #8e8e93; }
+  .coach-action-btn {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+    flex-shrink: 0;
+  }
+  .coach-action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .coach-send {
+    background: #1d1d1f;
+    color: #fff;
+  }
+  .coach-send:not(:disabled):hover { background: #000; }
+  .coach-send:not(:disabled):active { transform: scale(0.94); }
+  .coach-mic {
+    background: #fff;
+    color: #1d1d1f;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .coach-mic:hover { background: #f5f5f7; }
+  .coach-mic.listening {
+    background: #ff3b30;
+    color: #fff;
+    border-color: #ff3b30;
+    animation: coach-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes coach-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.5); }
+    50% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); }
+  }
+
+  .coach-empty {
+    text-align: center;
+    padding: 60px 24px 24px;
+    color: #6e6e73;
+  }
+  .coach-empty-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: -0.025em;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+  }
+  .coach-empty-subtitle {
+    font-size: 15px;
+    color: #6e6e73;
+    line-height: 1.5;
+    max-width: 380px;
+    margin: 0 auto 28px;
+  }
+  .coach-empty-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .coach-empty-card {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 14px;
+    padding: 14px 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .coach-empty-card:hover {
+    border-color: rgba(0, 0, 0, 0.14);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+  }
+  .coach-empty-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 4px;
+    letter-spacing: -0.005em;
+  }
+  .coach-empty-card-sub {
+    font-size: 12px;
+    color: #6e6e73;
+    letter-spacing: -0.005em;
+  }
+
+  .coach-error {
+    background: #fff5f5;
+    border: 1px solid #fee;
+    color: #c00;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 640px) {
+    .coach-shell { width: 100vw; height: 100vh; max-height: 100vh; margin: 0; border-radius: 0; }
+    .coach-msg { max-width: 88%; }
+  }
+
   /* Gamification card glow */
   .game-card {
     background: linear-gradient(135deg, rgba(10, 31, 10, 0.6), rgba(5, 18, 5, 0.8));
@@ -842,6 +1181,13 @@ tailwind.config = {
             <div class="w-6 h-6 rounded-full bg-forest-glow/20 flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#00E676" stroke-width="2"><path d="M2 7l4 4 8-8"/></svg></div>
             <span class="text-forest-200/80 text-sm">Voice assistant for hands-free interaction</span>
           </div>
+        </div>
+        <div class="reveal mt-8">
+          <button id="coach-open-btn" type="button" class="cta-btn px-6 py-4 rounded-xl font-semibold text-white inline-flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            Open the Coach
+          </button>
+          <p class="text-forest-400/50 text-xs mt-3">Live · powered by Gemini · knows your scanned meals</p>
         </div>
       </div>
 
@@ -1516,6 +1862,60 @@ tailwind.config = {
 })();
 </script>
 
+<!-- ==================== COACH DIALOG (white / Apple-clinical) ==================== -->
+<dialog id="coach-dialog" class="coach-dialog" aria-labelledby="coach-title">
+  <div class="coach-shell">
+    <!-- Header -->
+    <div class="coach-header">
+      <div class="coach-title-wrap">
+        <div class="coach-avatar">S</div>
+        <div>
+          <p id="coach-title" class="coach-title">Sanjeevani Coach</p>
+          <p class="coach-subtitle">
+            <span class="coach-dot" aria-hidden="true"></span>
+            <span id="coach-status">Online · powered by Gemini</span>
+          </p>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button id="coach-new-btn" type="button" class="coach-icon-btn" aria-label="New conversation" title="New conversation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button id="coach-close-btn" type="button" class="coach-icon-btn" aria-label="Close" title="Close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages area -->
+    <div id="coach-messages" class="coach-messages">
+      <!-- Empty state renders here when no messages -->
+    </div>
+
+    <!-- Quick-start chips (shown only when conversation has 0 user messages) -->
+    <div id="coach-chips" class="coach-chips" style="display:none">
+      <button type="button" class="coach-chip" data-coach-chip>What should I eat tonight based on my meals today?</button>
+      <button type="button" class="coach-chip" data-coach-chip>Am I getting enough protein?</button>
+      <button type="button" class="coach-chip" data-coach-chip>Plan a 20-minute home workout</button>
+      <button type="button" class="coach-chip" data-coach-chip>I feel anxious — what should I do right now?</button>
+    </div>
+
+    <!-- Input row -->
+    <div class="coach-input-row">
+      <button id="coach-mic-btn" type="button" class="coach-action-btn coach-mic" aria-label="Voice input" title="Voice input (browser permitting)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+      </button>
+      <div class="coach-textarea-wrap">
+        <textarea id="coach-input" class="coach-textarea" rows="1" placeholder="Ask anything about your health…" autocomplete="off"></textarea>
+      </div>
+      <button id="coach-send-btn" type="button" class="coach-action-btn coach-send" aria-label="Send" title="Send">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</dialog>
+
+
 <!-- ==================== SCANNER DIALOG ==================== -->
 <dialog id="sj-scanner-dialog" class="sj-dialog" aria-labelledby="sj-scanner-title">
   <div class="sj-dialog-shell">
@@ -2067,6 +2467,471 @@ If the image is not food, return {"error": "not_food"}.`;
 
   // Public API for future features (Coach, dashboard hookups)
   return { openScanner, closeScanner, loadState, saveState, patchState, logMeal, clearMeals, toast };
+})();
+
+
+/* ==================== SANJEEVANI COACH ENGINE ==================== */
+const SANJEEVANI_COACH = (() => {
+  const cfg = (typeof window !== 'undefined' && window.SANJEEVANI_CONFIG) || {};
+  const API_KEY = cfg.geminiApiKey || '';
+  const MODEL = cfg.geminiModel || 'gemini-flash-latest';
+  const STREAM_URL = (key) =>
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:streamGenerateContent?alt=sse&key=${encodeURIComponent(key)}`;
+  const MAX_CONVERSATIONS = 5;
+  const MAX_MSGS_PER_CONV = 40;
+
+  const $ = (id) => document.getElementById(id);
+
+  // ---- Conversation state (lives inside SANJEEVANI state) ----
+  function loadCoachState() {
+    const s = SANJEEVANI.loadState();
+    if (!s.coach) s.coach = { conversations: [], activeId: null, profile: {} };
+    return { full: s, coach: s.coach };
+  }
+  function saveCoachState(coach) {
+    SANJEEVANI.patchState({ coach });
+  }
+  function getActiveConv() {
+    const { coach } = loadCoachState();
+    let conv = coach.conversations.find(c => c.id === coach.activeId);
+    if (!conv) {
+      conv = newConversationObj();
+      coach.conversations.unshift(conv);
+      coach.activeId = conv.id;
+      saveCoachState(coach);
+    }
+    return conv;
+  }
+  function newConversationObj() {
+    return {
+      id: (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()),
+      title: 'New chat',
+      started_at: Date.now(),
+      updated_at: Date.now(),
+      messages: [],
+    };
+  }
+  function newConversation() {
+    const { coach } = loadCoachState();
+    const conv = newConversationObj();
+    coach.conversations.unshift(conv);
+    coach.conversations = coach.conversations.slice(0, MAX_CONVERSATIONS);
+    coach.activeId = conv.id;
+    saveCoachState(coach);
+    render();
+  }
+  function appendMessageToConv(role, text) {
+    const { coach } = loadCoachState();
+    let conv = coach.conversations.find(c => c.id === coach.activeId);
+    if (!conv) {
+      conv = newConversationObj();
+      coach.conversations.unshift(conv);
+      coach.activeId = conv.id;
+    }
+    conv.messages.push({ role, text, ts: Date.now() });
+    conv.messages = conv.messages.slice(-MAX_MSGS_PER_CONV);
+    conv.updated_at = Date.now();
+    if (conv.title === 'New chat' && role === 'user') {
+      conv.title = text.length > 40 ? text.slice(0, 40) + '…' : text;
+    }
+    saveCoachState(coach);
+    return conv;
+  }
+  function updateLastModelMessage(text) {
+    const { coach } = loadCoachState();
+    const conv = coach.conversations.find(c => c.id === coach.activeId);
+    if (!conv || !conv.messages.length) return;
+    const last = conv.messages[conv.messages.length - 1];
+    if (last.role === 'model') {
+      last.text = text;
+      conv.updated_at = Date.now();
+      saveCoachState(coach);
+    }
+  }
+
+  // ---- System prompt + meal context ----
+  function buildSystemInstruction() {
+    const s = SANJEEVANI.loadState();
+    const meals = (s.meals || []).slice(0, 7);
+    const today = new Date().toISOString().slice(0, 10);
+    const todaysMeals = meals.filter(m => new Date(m.timestamp).toISOString().slice(0, 10) === today);
+    const todaysKcal = todaysMeals.reduce((a, m) => a + (m.calories_kcal || 0), 0);
+    const todaysProtein = todaysMeals.reduce((a, m) => a + (m.protein_g || 0), 0);
+
+    const mealLines = meals.length
+      ? meals.map(m => `  - ${m.name} (${m.calories_kcal}kcal, ${m.protein_g}g P / ${m.carbs_g}g C / ${m.fats_g}g F, ${m.verdict}) on ${new Date(m.timestamp).toLocaleDateString()}`).join('\n')
+      : '  (no meals logged yet)';
+
+    return `You are Sanjeevani, an AI health coach for users in India and the Indian diaspora.
+
+Personality: Warm, precise, never preachy. Speak like a smart friend who happens to be a registered dietitian. Code-switch into Hindi / Tamil / Telugu / Bengali words ONLY when it genuinely helps (food names, cultural context) — never to seem trendy.
+
+Rules:
+- Default response length: 2-4 short sentences. Use bullet points only when listing 3+ items.
+- Ground every claim in the user's logged data when relevant. Cite numbers ("you've had ~${todaysKcal} kcal today").
+- End most replies with ONE concrete, doable next step the user can take in the next hour.
+- If the user asks for medical diagnosis or prescription advice, recommend they consult a doctor — do not diagnose.
+- Never recommend extreme diets, fasting longer than 18h, or extreme cardio.
+- If the user logs something concerning (very low calories, signs of an eating disorder, suicidal ideation), respond with care and recommend professional help (e.g. iCall India 9152987821).
+- Respect vegetarian / Jain / halal preferences if the user mentions them.
+
+USER CONTEXT (from local app data, today is ${today}):
+- Recent meals (most recent first):
+${mealLines}
+- Today so far: ${todaysMeals.length} meals, ~${todaysKcal} kcal, ${todaysProtein}g protein
+- Water logged today: ${s.water_ml || 0} ml
+- Steps today: ${s.steps || 0}
+
+If the user references "my meal" or "today" without specifics, use this context.`;
+  }
+
+  // ---- Render ----
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function renderMarkdown(raw) {
+    // Tiny markdown: escape first, then apply patterns
+    let html = escapeHtml(raw);
+    // Code spans
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    // Bold **x** / __x__
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+    // Italic *x* / _x_  (single, non-greedy, avoid bold artefacts)
+    html = html.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+    html = html.replace(/(^|[^_])_([^_\n]+)_(?!_)/g, '$1<em>$2</em>');
+    // Bullet lists
+    const lines = html.split('\n');
+    let out = '';
+    let inUl = false;
+    for (const line of lines) {
+      const m = line.match(/^\s*[-•]\s+(.*)$/);
+      if (m) {
+        if (!inUl) { out += '<ul>'; inUl = true; }
+        out += `<li>${m[1]}</li>`;
+      } else {
+        if (inUl) { out += '</ul>'; inUl = false; }
+        out += line + '\n';
+      }
+    }
+    if (inUl) out += '</ul>';
+    // Paragraphs (collapse multiple blank lines)
+    return out.replace(/\n{2,}/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>')
+              .replace(/<p>\s*<\/p>/g, '')
+              .replace(/<p>(<ul>)/g, '$1').replace(/(<\/ul>)<\/p>/g, '$1');
+  }
+
+  function timeLabel(ts) {
+    const d = new Date(ts);
+    const today = new Date();
+    const sameDay = d.toDateString() === today.toDateString();
+    return sameDay
+      ? d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+      : d.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  }
+
+  function render() {
+    const messages = $('coach-messages');
+    const chips = $('coach-chips');
+    const { coach } = loadCoachState();
+    const conv = coach.conversations.find(c => c.id === coach.activeId);
+    const list = conv?.messages || [];
+
+    if (list.length === 0) {
+      messages.innerHTML = `
+        <div class="coach-empty">
+          <div class="coach-empty-title">Hi there 👋</div>
+          <p class="coach-empty-subtitle">I'm your Sanjeevani Coach. I can see your scanned meals and help you plan, troubleshoot, or just answer questions. Try one of these:</p>
+          <div class="coach-empty-grid">
+            <button type="button" class="coach-empty-card" data-coach-chip>
+              <div class="coach-empty-card-title">Plan my dinner</div>
+              <div class="coach-empty-card-sub">based on what I've eaten today</div>
+            </button>
+            <button type="button" class="coach-empty-card" data-coach-chip>
+              <div class="coach-empty-card-title">Am I on track?</div>
+              <div class="coach-empty-card-sub">review my macros this week</div>
+            </button>
+            <button type="button" class="coach-empty-card" data-coach-chip>
+              <div class="coach-empty-card-title">15-min stress reset</div>
+              <div class="coach-empty-card-sub">I feel overwhelmed right now</div>
+            </button>
+            <button type="button" class="coach-empty-card" data-coach-chip>
+              <div class="coach-empty-card-title">Quick desi breakfast</div>
+              <div class="coach-empty-card-sub">high-protein, under 10 min</div>
+            </button>
+          </div>
+        </div>`;
+      chips.style.display = 'none';
+      bindChipHandlers();
+      return;
+    }
+
+    messages.innerHTML = list.map((m, i) => {
+      if (m.role === 'user') {
+        return `<div class="coach-row user">
+                  <div class="coach-msg user">${escapeHtml(m.text)}</div>
+                  <div class="coach-meta">You · ${timeLabel(m.ts)}</div>
+                </div>`;
+      } else {
+        return `<div class="coach-row model">
+                  <div class="coach-msg model" id="coach-msg-${i}">${renderMarkdown(m.text || '')}</div>
+                  <div class="coach-meta">Sanjeevani · ${timeLabel(m.ts)}</div>
+                </div>`;
+      }
+    }).join('');
+    chips.style.display = list.length === 1 && list[0].role === 'user' ? 'none' : 'none';
+    scrollToBottom();
+  }
+
+  function bindChipHandlers() {
+    document.querySelectorAll('[data-coach-chip]').forEach(el => {
+      el.addEventListener('click', () => {
+        const txt = el.dataset.coachChip || el.textContent.trim();
+        sendUserMessage(txt);
+      }, { once: true });
+    });
+  }
+
+  function scrollToBottom() {
+    const m = $('coach-messages');
+    if (m) m.scrollTop = m.scrollHeight;
+  }
+
+  // ---- Streaming Gemini call ----
+  let inflightAbort = null;
+
+  async function sendUserMessage(text) {
+    text = (text || '').trim();
+    if (!text || inflightAbort) return;
+    appendMessageToConv('user', text);
+    appendMessageToConv('model', ''); // placeholder we'll fill via stream
+    render();
+
+    // Add a typing indicator inside the placeholder
+    const msgs = $('coach-messages');
+    const lastRow = msgs.lastElementChild;
+    const lastBubble = lastRow?.querySelector('.coach-msg.model');
+    if (lastBubble) {
+      lastBubble.innerHTML = `<span class="coach-typing-dots"><span></span><span></span><span></span></span>`;
+    }
+
+    setSending(true);
+
+    if (!API_KEY) {
+      // Demo fallback
+      setTimeout(() => {
+        const fake = `I'd love to give you a real answer, but no Gemini API key is configured. Drop one in \`config.local.js\` and I'll stream live replies grounded in your meals.
+
+Try this in the meantime: drink a glass of water and take 10 slow breaths.`;
+        finishStream(fake);
+      }, 700);
+      return;
+    }
+
+    try {
+      inflightAbort = new AbortController();
+      const { coach } = loadCoachState();
+      const conv = coach.conversations.find(c => c.id === coach.activeId);
+      const history = (conv?.messages || [])
+        .slice(0, -1) // drop the empty model placeholder we just appended
+        .map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
+
+      const body = {
+        systemInstruction: { parts: [{ text: buildSystemInstruction() }] },
+        contents: history,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 800,
+          thinkingConfig: { thinkingBudget: 0 },
+        },
+      };
+
+      const res = await fetch(STREAM_URL(API_KEY), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: inflightAbort.signal,
+      });
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        throw new Error(`Gemini ${res.status}: ${errText.slice(0, 200)}`);
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      let assembled = '';
+      let bubbleEl = lastBubble;
+      bubbleEl.innerHTML = `<span class="coach-cursor"></span>`;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        let idx;
+        while ((idx = buf.indexOf('\n')) !== -1) {
+          const line = buf.slice(0, idx).trim();
+          buf = buf.slice(idx + 1);
+          if (!line.startsWith('data:')) continue;
+          const payload = line.slice(5).trim();
+          if (!payload || payload === '[DONE]') continue;
+          try {
+            const chunk = JSON.parse(payload);
+            const piece = chunk?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (piece) {
+              assembled += piece;
+              bubbleEl.innerHTML = renderMarkdown(assembled) + '<span class="coach-cursor"></span>';
+              scrollToBottom();
+            }
+          } catch (_) { /* ignore partial */ }
+        }
+      }
+      finishStream(assembled);
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        finishStream(lastBubble?.innerText || '(stopped)');
+      } else {
+        console.error(err);
+        const errMsg = `Sorry — I couldn't reach the model. ${escapeHtml(err.message || 'Unknown error')}`;
+        if (lastBubble) lastBubble.innerHTML = `<div class="coach-error">${errMsg}</div>`;
+        updateLastModelMessage(`(error) ${err.message}`);
+        setSending(false);
+        inflightAbort = null;
+      }
+    }
+  }
+
+  function finishStream(finalText) {
+    const msgs = $('coach-messages');
+    const lastBubble = msgs?.querySelector('.coach-row.model:last-child .coach-msg.model');
+    if (lastBubble) lastBubble.innerHTML = renderMarkdown(finalText);
+    updateLastModelMessage(finalText);
+    setSending(false);
+    inflightAbort = null;
+    scrollToBottom();
+  }
+
+  function setSending(on) {
+    const btn = $('coach-send-btn');
+    if (!btn) return;
+    btn.disabled = on;
+    btn.innerHTML = on
+      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>`
+      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>`;
+    btn.dataset.mode = on ? 'stop' : 'send';
+  }
+
+  // ---- Voice input ----
+  let recog = null;
+  function setupVoice() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const micBtn = $('coach-mic-btn');
+    if (!SR) {
+      micBtn.style.display = 'none';
+      return;
+    }
+    recog = new SR();
+    recog.lang = 'en-IN';
+    recog.continuous = false;
+    recog.interimResults = true;
+    let finalT = '';
+    recog.onresult = (e) => {
+      let interim = '';
+      finalT = '';
+      for (let i = 0; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) finalT += r[0].transcript;
+        else interim += r[0].transcript;
+      }
+      $('coach-input').value = (finalT + interim).trim();
+      autoresize();
+    };
+    recog.onend = () => micBtn.classList.remove('listening');
+    recog.onerror = (e) => {
+      micBtn.classList.remove('listening');
+      if (e.error === 'not-allowed') {
+        SANJEEVANI.toast('Microphone permission denied', 'error');
+      }
+    };
+    micBtn.addEventListener('click', () => {
+      if (micBtn.classList.contains('listening')) {
+        recog.stop();
+      } else {
+        try {
+          $('coach-input').value = '';
+          recog.start();
+          micBtn.classList.add('listening');
+        } catch (_) {}
+      }
+    });
+  }
+
+  // ---- Input box ----
+  function autoresize() {
+    const ta = $('coach-input');
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(140, ta.scrollHeight) + 'px';
+  }
+
+  // ---- Open/close ----
+  function open() {
+    const dlg = $('coach-dialog');
+    if (!dlg) return;
+    render();
+    dlg.showModal();
+    setTimeout(() => $('coach-input')?.focus(), 100);
+  }
+  function close() {
+    const dlg = $('coach-dialog');
+    if (dlg?.open) dlg.close();
+    if (inflightAbort) { try { inflightAbort.abort(); } catch (_) {} }
+  }
+
+  // ---- Init ----
+  function init() {
+    if (!$('coach-dialog')) return;
+
+    $('coach-open-btn')?.addEventListener('click', open);
+    $('coach-close-btn')?.addEventListener('click', close);
+    $('coach-new-btn')?.addEventListener('click', () => {
+      newConversation();
+      setTimeout(() => $('coach-input')?.focus(), 50);
+    });
+    $('coach-dialog').addEventListener('close', () => {
+      if (inflightAbort) { try { inflightAbort.abort(); } catch (_) {} }
+    });
+
+    const ta = $('coach-input');
+    ta.addEventListener('input', autoresize);
+    ta.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const v = ta.value.trim();
+        if (v) { ta.value = ''; autoresize(); sendUserMessage(v); }
+      }
+    });
+    $('coach-send-btn').addEventListener('click', () => {
+      if ($('coach-send-btn').dataset.mode === 'stop') {
+        if (inflightAbort) { try { inflightAbort.abort(); } catch (_) {} }
+        return;
+      }
+      const v = ta.value.trim();
+      if (v) { ta.value = ''; autoresize(); sendUserMessage(v); }
+    });
+
+    setupVoice();
+
+    if (!API_KEY) {
+      $('coach-status').textContent = 'Demo mode · add API key to config.local.js';
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  return { open, close, newConversation, sendUserMessage };
 })();
 </script>
 
