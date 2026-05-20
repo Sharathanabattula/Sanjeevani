@@ -3,3 +3,8 @@
 node_modules/
 web-design-main/
 *.log
+
+# Secrets — never commit
+config.local.js
+.env
+.env.local
