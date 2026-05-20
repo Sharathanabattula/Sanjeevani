@@ -1954,63 +1954,106 @@ tailwind.config = {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
       <!-- Left: Scanner Visual -->
       <div class="reveal order-2 lg:order-1">
-        <div class="glass-card rounded-3xl p-8 max-w-md mx-auto lg:mx-0 relative overflow-hidden">
-          <!-- Scanner Header -->
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="font-display font-bold text-lg text-white">Food Scanner</h3>
-            <span id="sj-meal-verdict" class="px-3 py-1 rounded-full bg-forest-glow/20 text-forest-glow text-xs font-bold">Healthy</span>
+        <div class="glass-card rounded-3xl p-7 md:p-8 max-w-md mx-auto lg:mx-0 relative overflow-hidden">
+          <!-- Section label -->
+          <p class="text-forest-400/60 text-[10px] font-mono uppercase tracking-[0.2em] mb-3">Latest Scan</p>
+
+          <!-- Dish name HERO -->
+          <div class="mb-4">
+            <h3 id="sj-meal-name" class="font-display font-bold text-2xl md:text-[28px] text-white leading-tight tracking-tight" style="word-break: break-word;">Tap to scan</h3>
+            <p id="sj-meal-description" class="text-forest-300/55 text-sm mt-1">Your last meal will appear here</p>
           </div>
 
-          <!-- Food Image (live) -->
-          <div id="sj-meal-image-wrap" class="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-forest-800/40 to-forest-900/60 mb-6 flex items-center justify-center relative overflow-hidden border border-forest-700/15">
+          <!-- Verdict + cooking method row -->
+          <div class="flex items-center gap-2 mb-5 flex-wrap">
+            <span id="sj-meal-verdict" class="px-3 py-1 rounded-full bg-forest-800/40 text-forest-300/60 text-xs font-bold tracking-wide">—</span>
+            <span id="sj-meal-cooking" class="hidden px-2.5 py-1 rounded-full bg-forest-800/30 border border-forest-700/20 text-forest-300/70 text-[11px] font-medium"></span>
+            <span id="sj-meal-oil" class="hidden px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-200/80 text-[11px] font-medium"></span>
+          </div>
+
+          <!-- Food Image -->
+          <div id="sj-meal-image-wrap" class="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-forest-800/40 to-forest-900/60 mb-5 flex items-center justify-center relative overflow-hidden border border-forest-700/15">
             <div id="sj-meal-image-placeholder" class="text-center">
               <span class="text-6xl block mb-3">🍛</span>
-              <p id="sj-meal-name" class="text-forest-300/60 text-sm">Indian Thali</p>
-              <p id="sj-meal-kcal" class="text-forest-glow text-xs mt-1">450 kcal</p>
+              <p id="sj-meal-kcal-placeholder" class="text-forest-300/40 text-xs">Awaiting your first scan</p>
             </div>
             <div class="absolute inset-0 bg-gradient-to-b from-forest-glow/5 via-transparent to-transparent animate-pulse"></div>
             <div class="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-forest-glow/50 rounded-tl"></div>
             <div class="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-forest-glow/50 rounded-tr"></div>
             <div class="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-forest-glow/50 rounded-bl"></div>
             <div class="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-forest-glow/50 rounded-br"></div>
+            <!-- Image kcal overlay (shown when an image is loaded) -->
+            <div id="sj-meal-image-overlay" class="hidden absolute left-3 bottom-3 z-10 bg-black/55 backdrop-blur-sm border border-white/10 px-3 py-1.5 rounded-xl">
+              <span id="sj-meal-kcal" class="text-white font-display font-bold text-base">— kcal</span>
+            </div>
           </div>
 
+          <!-- Verdict reason (one line) -->
+          <p id="sj-meal-verdict-reason" class="hidden text-forest-300/55 text-xs italic mb-4 -mt-1"></p>
+
           <!-- Nutrition Breakdown -->
-          <div class="grid grid-cols-3 gap-3 mb-6">
+          <div class="grid grid-cols-3 gap-3 mb-5">
             <div class="nutrition-pill text-center">
               <p class="text-forest-400/60 text-xs mb-1">Carbs</p>
-              <p id="sj-meal-carbs" class="font-display font-bold text-white">62g</p>
-              <p id="sj-meal-carbs-note" class="text-forest-400/40 text-xs mt-0.5">18g fiber</p>
+              <p id="sj-meal-carbs" class="font-display font-bold text-white">—</p>
+              <p id="sj-meal-carbs-note" class="text-forest-400/40 text-xs mt-0.5">fiber</p>
             </div>
             <div class="nutrition-pill text-center">
               <p class="text-forest-400/60 text-xs mb-1">Protein</p>
-              <p id="sj-meal-protein" class="font-display font-bold text-white">18g</p>
-              <p id="sj-meal-protein-note" class="text-forest-400/40 text-xs mt-0.5">12g plant</p>
+              <p id="sj-meal-protein" class="font-display font-bold text-white">—</p>
+              <p id="sj-meal-protein-note" class="text-forest-400/40 text-xs mt-0.5"></p>
             </div>
             <div class="nutrition-pill text-center">
               <p class="text-forest-400/60 text-xs mb-1">Fats</p>
-              <p id="sj-meal-fats" class="font-display font-bold text-white">12g</p>
-              <p id="sj-meal-fats-note" class="text-forest-400/40 text-xs mt-0.5">8g healthy</p>
+              <p id="sj-meal-fats" class="font-display font-bold text-white">—</p>
+              <p id="sj-meal-fats-note" class="text-forest-400/40 text-xs mt-0.5">saturated</p>
             </div>
           </div>
 
-          <!-- AI Suggestion -->
-          <div class="p-4 rounded-xl bg-forest-glow/5 border border-forest-glow/15 flex items-start gap-3">
-            <div class="w-8 h-8 rounded-full bg-forest-glow/20 flex items-center justify-center shrink-0">🤖</div>
-            <div>
-              <p class="text-forest-glow text-xs font-semibold mb-1">AI Suggestion</p>
-              <p id="sj-meal-suggestion" class="text-forest-200/70 text-sm">Try reducing rice quantity and add more salad for better fiber balance.</p>
+          <!-- Smart Swap (hero card) -->
+          <div id="sj-meal-swap" class="hidden mb-4 rounded-2xl p-4 bg-gradient-to-br from-forest-glow/10 to-forest-600/5 border border-forest-glow/25 relative overflow-hidden">
+            <div class="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-forest-glow/10 blur-2xl"></div>
+            <div class="relative">
+              <div class="flex items-center gap-2 mb-2.5">
+                <div class="w-7 h-7 rounded-full bg-forest-glow/25 flex items-center justify-center text-sm">🔄</div>
+                <p class="text-forest-glow text-[11px] font-bold uppercase tracking-[0.12em]">Smart Swap</p>
+              </div>
+              <p class="text-forest-100 text-[15px] leading-relaxed mb-2">
+                <span class="text-forest-300/60 text-xs">Instead of</span>
+                <span id="sj-meal-swap-from" class="block font-medium text-forest-100/90 mb-1.5">—</span>
+                <span class="text-forest-300/60 text-xs">try</span>
+                <span id="sj-meal-swap-to" class="block font-semibold text-white">—</span>
+              </p>
+              <p id="sj-meal-swap-why" class="text-forest-300/70 text-xs leading-relaxed border-t border-forest-glow/15 pt-2.5 mt-2">—</p>
             </div>
+          </div>
+
+          <!-- Components breakdown (collapsible) -->
+          <details id="sj-meal-components-details" class="hidden mb-4 group">
+            <summary class="list-none cursor-pointer flex items-center justify-between py-2.5 px-3.5 rounded-xl bg-forest-800/25 border border-forest-700/15 hover:bg-forest-800/40 transition-colors">
+              <span class="text-forest-200/85 text-sm font-medium flex items-center gap-2">
+                <span class="text-base">🍽️</span>
+                What's in this dish
+              </span>
+              <svg class="w-4 h-4 text-forest-300/60 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </summary>
+            <ul id="sj-meal-components" class="mt-2 px-1 space-y-1.5"></ul>
+          </details>
+
+          <!-- Generic AI Suggestion (kept as a secondary note) -->
+          <div id="sj-meal-suggestion-wrap" class="hidden p-3.5 rounded-xl bg-forest-800/20 border border-forest-700/15 flex items-start gap-3 mb-4">
+            <div class="w-7 h-7 rounded-full bg-forest-glow/15 flex items-center justify-center shrink-0 text-sm">💡</div>
+            <p id="sj-meal-suggestion" class="text-forest-200/65 text-[13px] leading-relaxed"></p>
           </div>
 
           <!-- Scan Button -->
-          <button id="sj-open-scanner" type="button" class="cta-btn w-full mt-6 px-6 py-4 rounded-xl font-semibold text-white">
+          <button id="sj-open-scanner" type="button" class="cta-btn w-full mt-2 px-6 py-4 rounded-xl font-semibold text-white">
             <span class="flex items-center justify-center gap-2">
               <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
               <span id="sj-scan-btn-label">Scan a Meal</span>
             </span>
           </button>
-          <p id="sj-meal-meta" class="text-forest-400/50 text-xs mt-3 text-center">Powered by Gemini Vision · saved locally · <a href="#" id="sj-view-history" class="underline hover:text-forest-glow">view history</a></p>
+          <p id="sj-meal-meta" class="text-forest-400/50 text-xs mt-3 text-center">Powered by Gemini Vision · synced to your account · <a href="#" id="sj-view-history" class="underline hover:text-forest-glow">view history</a></p>
         </div>
       </div>
 
@@ -2816,6 +2859,62 @@ tailwind.config = {
         <span id="sj-analyze-label">Analyze with AI</span>
       </button>
     </div>
+
+    <!-- ===== In-dialog result preview (shown after analysis) ===== -->
+    <div id="sj-result-view" class="px-6 pb-6 pt-1" style="display:none">
+      <div class="rounded-2xl overflow-hidden border border-forest-700/15 bg-gradient-to-br from-forest-800/30 to-forest-900/40 mb-4">
+        <div class="relative">
+          <img id="sj-result-image" alt="" class="w-full aspect-[16/10] object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <p class="text-forest-glow/90 text-[10px] font-mono uppercase tracking-[0.2em] mb-1">Identified</p>
+                <h3 id="sj-result-name" class="font-display font-bold text-2xl text-white leading-tight" style="word-break:break-word;">—</h3>
+                <p id="sj-result-description" class="text-white/75 text-xs mt-1.5"></p>
+              </div>
+              <span id="sj-result-verdict" class="shrink-0 px-3 py-1 rounded-full bg-white/10 backdrop-blur text-white text-xs font-bold">—</span>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-4 divide-x divide-forest-700/15 text-center bg-forest-900/30">
+          <div class="py-3">
+            <p class="text-forest-glow font-display font-bold text-base"><span id="sj-result-kcal">0</span></p>
+            <p class="text-forest-300/50 text-[10px] uppercase tracking-wider mt-0.5">kcal</p>
+          </div>
+          <div class="py-3">
+            <p class="text-white font-display font-bold text-base"><span id="sj-result-carbs">0</span>g</p>
+            <p class="text-forest-300/50 text-[10px] uppercase tracking-wider mt-0.5">carbs</p>
+          </div>
+          <div class="py-3">
+            <p class="text-white font-display font-bold text-base"><span id="sj-result-protein">0</span>g</p>
+            <p class="text-forest-300/50 text-[10px] uppercase tracking-wider mt-0.5">protein</p>
+          </div>
+          <div class="py-3">
+            <p class="text-white font-display font-bold text-base"><span id="sj-result-fats">0</span>g</p>
+            <p class="text-forest-300/50 text-[10px] uppercase tracking-wider mt-0.5">fats</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Smart Swap teaser -->
+      <div id="sj-result-swap" class="hidden mb-4 rounded-xl p-3.5 bg-forest-glow/8 border border-forest-glow/20">
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="text-base">🔄</span>
+          <p class="text-forest-glow text-[10px] font-bold uppercase tracking-[0.15em]">Smart Swap</p>
+        </div>
+        <p class="text-forest-100 text-sm leading-relaxed">
+          Try <span id="sj-result-swap-to" class="font-semibold text-white">—</span>
+          <span class="text-forest-300/60"> instead of</span>
+          <span id="sj-result-swap-from" class="text-forest-100/85">—</span>
+        </p>
+      </div>
+
+      <div class="flex gap-2">
+        <button id="sj-result-scan-another" type="button" class="sj-btn sj-btn-ghost flex-1">↻ Scan another</button>
+        <button id="sj-result-done" type="button" class="sj-btn sj-btn-primary flex-1">View full details</button>
+      </div>
+    </div>
   </div>
 
   <canvas id="sj-canvas" style="display:none"></canvas>
@@ -3097,6 +3196,7 @@ const SANJEEVANI = (() => {
     $('sj-retake').style.display = 'none';
     $('sj-analyze').style.display = 'none';
     setAnalyzing(false);
+    if (typeof showCaptureView === 'function') showCaptureView();
     setStatus('Frame your meal and tap Capture.', '');
   }
 
@@ -3123,32 +3223,24 @@ const SANJEEVANI = (() => {
   }
 
   // ---- Gemini Vision call ----
-  const ANALYZE_PROMPT = `You are a nutrition analyst with deep knowledge of Indian cuisine.
-Analyze the food in this image. Identify the dish (favor specific Indian names if applicable), estimate calories and macronutrients for ONE typical serving, and give one short, practical health suggestion.
+  // Dev-path prompt (kept in sync with the server-side prompt in api/gemini-vision.js).
+  // In production the proxy uses its own prompt and injects profile context.
+  const ANALYZE_PROMPT = `You are an Indian-cuisine nutrition analyst. Mentally DECONSTRUCT the dish into 2-6 visible components, then INFER the hidden cooking-oil/ghee per component (deep-fry items absorb 1.5-3 tsp/piece, tadkas add 1-2 tsp, restaurant gravies 2-4 tsp). Sum into hidden_oil_tsp. Use the most specific Indian dish name. Craft a Smart Swap that changes the WORST component first and includes a quantified benefit.
 
-Return ONLY valid minified JSON matching this schema (no markdown fences, no commentary):
-{
-  "name": "string (e.g. 'Veg Thali', 'Masala Dosa', 'Mixed Berry Bowl')",
-  "calories_kcal": number,
-  "carbs_g": number,
-  "fiber_g": number,
-  "protein_g": number,
-  "fats_g": number,
-  "saturated_fats_g": number,
-  "verdict": "Healthy" | "Moderate" | "Indulgent",
-  "suggestion": "one short sentence, <= 25 words"
-}
-If the image is not food, return {"error": "not_food"}.`;
+Return ONLY valid minified JSON (no markdown):
+{"name":"string","description":"string<=80","cooking_method":"deep-fried|shallow-fried|tempered|tandoor|steamed|boiled|raw|restaurant-style|home-style|street-food|mixed","hidden_oil_tsp":number,"components":[{"name":"string","portion":"string","calories_kcal":number,"fats_g":number,"notes":"string<=60"}],"calories_kcal":number,"carbs_g":number,"fiber_g":number,"protein_g":number,"fats_g":number,"saturated_fats_g":number,"verdict":"Healthy|Moderate|Indulgent","verdict_reason":"string<=70","suggestion":"string<=25 words","smart_swap":{"instead_of":"string","swap_to":"string","why":"string<=90 (quantified)"}}
+If not food: {"error":"not_food"}.`;
 
   async function analyzeWithGemini(dataUrl) {
     const base64 = dataUrl.split(',')[1];
 
     // Production path: proxy through /api/gemini-vision (server holds the key).
     if (USE_PROXY) {
+      const profile = (loadState && loadState().profile) || (window.SANJEEVANI_PROFILE?.get?.() || null);
       const res = await fetch('/api/gemini-vision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_base64: base64, mime_type: 'image/jpeg' }),
+        body: JSON.stringify({ image_base64: base64, mime_type: 'image/jpeg', profile }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -3195,19 +3287,89 @@ If the image is not food, return {"error": "not_food"}.`;
 
   function demoAnalyze() {
     const samples = [
-      { name: 'Veg Thali', calories_kcal: 520, carbs_g: 68, fiber_g: 14, protein_g: 22, fats_g: 18, saturated_fats_g: 6, verdict: 'Moderate', suggestion: 'Swap one roti for an extra serving of dal for more protein and fiber.' },
-      { name: 'Masala Dosa', calories_kcal: 410, carbs_g: 62, fiber_g: 5, protein_g: 11, fats_g: 14, saturated_fats_g: 5, verdict: 'Moderate', suggestion: 'Pair with sambar instead of coconut chutney to cut saturated fat.' },
-      { name: 'Mixed Fruit Bowl', calories_kcal: 180, carbs_g: 42, fiber_g: 8, protein_g: 3, fats_g: 1, saturated_fats_g: 0, verdict: 'Healthy', suggestion: 'Add a handful of nuts for healthy fats and longer satiety.' },
-      { name: 'Chole Bhature', calories_kcal: 720, carbs_g: 92, fiber_g: 11, protein_g: 22, fats_g: 28, saturated_fats_g: 9, verdict: 'Indulgent', suggestion: 'Enjoy in moderation; balance with a fiber-rich salad and a long walk after.' },
+      {
+        name: 'Chole Bhature', description: '1 plate · 2 bhature + chole, onion + pickle, restaurant-style',
+        cooking_method: 'deep-fried', hidden_oil_tsp: 4,
+        components: [
+          { name: 'Bhature (deep-fried)', portion: '2 pieces', calories_kcal: 380, fats_g: 18, notes: 'maida, deep-fried in oil' },
+          { name: 'Chole curry', portion: '1 bowl', calories_kcal: 280, fats_g: 9, notes: '~1 tbsp ghee in tadka' },
+          { name: 'Onion + pickle', portion: 'side', calories_kcal: 30, fats_g: 1, notes: '' },
+        ],
+        calories_kcal: 720, carbs_g: 92, fiber_g: 11, protein_g: 22, fats_g: 28, saturated_fats_g: 9,
+        verdict: 'Indulgent', verdict_reason: '~4 tsp absorbed deep-fry oil + refined maida spike',
+        suggestion: 'Enjoy in moderation; balance with a fiber-rich salad and a long walk after.',
+        smart_swap: { instead_of: '2 deep-fried bhature', swap_to: '2 whole-wheat rotis + cucumber raita', why: 'cuts ~3 tsp cooking oil, adds 8g yogurt protein, ~18% lower sugar spike' }
+      },
+      {
+        name: 'Masala Dosa', description: '1 dosa · potato filling, coconut chutney + sambar',
+        cooking_method: 'shallow-fried', hidden_oil_tsp: 2,
+        components: [
+          { name: 'Dosa crepe', portion: '1 large', calories_kcal: 230, fats_g: 8, notes: 'rice + urad batter, oil-griddled' },
+          { name: 'Potato masala', portion: '1/2 cup', calories_kcal: 110, fats_g: 4, notes: 'tempered with mustard + curry leaves' },
+          { name: 'Coconut chutney', portion: '2 tbsp', calories_kcal: 50, fats_g: 4, notes: 'high saturated fat' },
+          { name: 'Sambar', portion: '1/2 cup', calories_kcal: 20, fats_g: 0.5, notes: 'lentil-veg, low fat' },
+        ],
+        calories_kcal: 410, carbs_g: 62, fiber_g: 5, protein_g: 11, fats_g: 14, saturated_fats_g: 5,
+        verdict: 'Moderate', verdict_reason: 'coconut chutney drives saturated fat',
+        suggestion: 'Pair with sambar instead of coconut chutney to cut saturated fat.',
+        smart_swap: { instead_of: 'coconut chutney', swap_to: 'a second helping of sambar', why: 'saves ~80 kcal and 6g saturated fat per serving' }
+      },
+      {
+        name: 'Paneer Butter Masala + Naan', description: '1 plate · restaurant-style gravy, 1 butter naan',
+        cooking_method: 'restaurant-style', hidden_oil_tsp: 5,
+        components: [
+          { name: 'Paneer butter masala', portion: '1 cup', calories_kcal: 380, fats_g: 26, notes: '~2 tbsp butter + cream' },
+          { name: 'Butter naan', portion: '1 piece', calories_kcal: 320, fats_g: 9, notes: 'maida, brushed with butter' },
+          { name: 'Onion salad', portion: 'side', calories_kcal: 20, fats_g: 0, notes: '' },
+        ],
+        calories_kcal: 720, carbs_g: 64, fiber_g: 4, protein_g: 20, fats_g: 35, saturated_fats_g: 16,
+        verdict: 'Indulgent', verdict_reason: 'cream + butter gravy + refined-flour naan',
+        suggestion: 'Ask for "less butter, less cream" next time.',
+        smart_swap: { instead_of: 'butter naan + buttery paneer gravy', swap_to: 'tandoori roti + lighter "kadai paneer"', why: 'saves ~250 kcal and 12g saturated fat, keeps the paneer protein' }
+      },
+      {
+        name: 'Idli + Sambar', description: '3 idlis · sambar + coconut chutney',
+        cooking_method: 'steamed', hidden_oil_tsp: 1,
+        components: [
+          { name: 'Idli', portion: '3 pieces', calories_kcal: 180, fats_g: 1, notes: 'steamed, no oil' },
+          { name: 'Sambar', portion: '1 cup', calories_kcal: 80, fats_g: 2, notes: 'mild tadka' },
+          { name: 'Coconut chutney', portion: '2 tbsp', calories_kcal: 50, fats_g: 4, notes: '' },
+        ],
+        calories_kcal: 310, carbs_g: 52, fiber_g: 6, protein_g: 11, fats_g: 7, saturated_fats_g: 3,
+        verdict: 'Healthy', verdict_reason: 'steamed + lentil-veg protein, low oil',
+        suggestion: 'Great breakfast. Add boiled egg or peanut chutney for more protein.',
+        smart_swap: { instead_of: 'coconut chutney', swap_to: 'tomato-onion chutney', why: 'cuts ~30 kcal of saturated fat, more lycopene + fiber' }
+      }
     ];
     return normalizeMeal(samples[Math.floor(Math.random() * samples.length)]);
   }
 
   function normalizeMeal(m) {
     const num = (v, d = 0) => (typeof v === 'number' && isFinite(v) ? Math.round(v) : d);
+    const str = (v, max, d = '') => String(v ?? d).slice(0, max);
     const verdict = ['Healthy', 'Moderate', 'Indulgent'].includes(m.verdict) ? m.verdict : 'Moderate';
+    const cookingMethods = ['deep-fried','shallow-fried','tempered','tandoor','steamed','boiled','raw','restaurant-style','home-style','street-food','mixed'];
+    const cookingMethod = cookingMethods.includes(m.cooking_method) ? m.cooking_method : 'mixed';
+    const rawComponents = Array.isArray(m.components) ? m.components.slice(0, 8) : [];
+    const components = rawComponents.map(c => ({
+      name: str(c?.name, 50, 'Component'),
+      portion: str(c?.portion, 30, ''),
+      calories_kcal: num(c?.calories_kcal),
+      fats_g: num(c?.fats_g),
+      notes: str(c?.notes, 80, ''),
+    })).filter(c => c.name);
+    const ss = m.smart_swap && typeof m.smart_swap === 'object' ? m.smart_swap : null;
+    const smart_swap = ss ? {
+      instead_of: str(ss.instead_of, 80, ''),
+      swap_to: str(ss.swap_to, 120, ''),
+      why: str(ss.why, 120, ''),
+    } : null;
     return {
-      name: String(m.name || 'Meal').slice(0, 60),
+      name: str(m.name, 60, 'Meal'),
+      description: str(m.description, 100, ''),
+      cooking_method: cookingMethod,
+      hidden_oil_tsp: num(m.hidden_oil_tsp),
+      components,
       calories_kcal: num(m.calories_kcal),
       carbs_g: num(m.carbs_g),
       fiber_g: num(m.fiber_g),
@@ -3215,29 +3377,88 @@ If the image is not food, return {"error": "not_food"}.`;
       fats_g: num(m.fats_g),
       saturated_fats_g: num(m.saturated_fats_g),
       verdict,
-      suggestion: String(m.suggestion || 'Stay mindful of portions.').slice(0, 200),
+      verdict_reason: str(m.verdict_reason, 90, ''),
+      suggestion: str(m.suggestion, 220, 'Stay mindful of portions.'),
+      smart_swap: smart_swap && (smart_swap.instead_of || smart_swap.swap_to) ? smart_swap : null,
     };
   }
 
   // ---- Render meal into the on-page scanner card ----
   function renderMeal(meal, imageDataUrl) {
-    $('sj-meal-name').textContent = meal.name;
-    $('sj-meal-kcal').textContent = `${meal.calories_kcal} kcal`;
+    const escape = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+    $('sj-meal-name').textContent = meal.name || 'Meal';
+    $('sj-meal-description').textContent = meal.description || `${meal.calories_kcal || 0} kcal · just analyzed`;
+    $('sj-meal-kcal').textContent = `${meal.calories_kcal || 0} kcal`;
     $('sj-meal-carbs').textContent = `${meal.carbs_g}g`;
     $('sj-meal-carbs-note').textContent = `${meal.fiber_g}g fiber`;
     $('sj-meal-protein').textContent = `${meal.protein_g}g`;
-    $('sj-meal-protein-note').textContent = meal.protein_g >= 15 ? 'good source' : 'low';
+    $('sj-meal-protein-note').textContent = meal.protein_g >= 15 ? 'good source' : (meal.protein_g >= 8 ? 'moderate' : 'low');
     $('sj-meal-fats').textContent = `${meal.fats_g}g`;
-    $('sj-meal-fats-note').textContent = `${meal.saturated_fats_g}g saturated`;
-    $('sj-meal-suggestion').textContent = meal.suggestion;
+    $('sj-meal-fats-note').textContent = `${meal.saturated_fats_g || 0}g saturated`;
 
+    // Verdict pill
     const verdictEl = $('sj-meal-verdict');
-    verdictEl.textContent = meal.verdict;
-    verdictEl.className = 'px-3 py-1 rounded-full text-xs font-bold ';
+    verdictEl.textContent = meal.verdict || '—';
+    verdictEl.className = 'px-3 py-1 rounded-full text-xs font-bold tracking-wide ';
     if (meal.verdict === 'Healthy') verdictEl.className += 'bg-forest-glow/20 text-forest-glow';
     else if (meal.verdict === 'Moderate') verdictEl.className += 'bg-yellow-400/15 text-yellow-300';
-    else verdictEl.className += 'bg-red-400/15 text-red-300';
+    else if (meal.verdict === 'Indulgent') verdictEl.className += 'bg-red-400/15 text-red-300';
+    else verdictEl.className += 'bg-forest-800/40 text-forest-300/60';
 
+    // Cooking method badge
+    const cookingEl = $('sj-meal-cooking');
+    if (meal.cooking_method && meal.cooking_method !== 'mixed') {
+      cookingEl.textContent = meal.cooking_method.replace(/-/g, ' ');
+      cookingEl.classList.remove('hidden');
+    } else { cookingEl.classList.add('hidden'); }
+
+    // Hidden oil badge
+    const oilEl = $('sj-meal-oil');
+    if (typeof meal.hidden_oil_tsp === 'number' && meal.hidden_oil_tsp > 0) {
+      oilEl.textContent = `~${meal.hidden_oil_tsp} tsp hidden oil`;
+      oilEl.classList.remove('hidden');
+    } else { oilEl.classList.add('hidden'); }
+
+    // Verdict reason
+    const reasonEl = $('sj-meal-verdict-reason');
+    if (meal.verdict_reason) { reasonEl.textContent = meal.verdict_reason; reasonEl.classList.remove('hidden'); }
+    else { reasonEl.classList.add('hidden'); }
+
+    // Generic suggestion (kept as secondary tip)
+    const sugWrap = $('sj-meal-suggestion-wrap');
+    if (meal.suggestion) { $('sj-meal-suggestion').textContent = meal.suggestion; sugWrap.classList.remove('hidden'); }
+    else { sugWrap.classList.add('hidden'); }
+
+    // Smart Swap card
+    const swap = meal.smart_swap;
+    const swapEl = $('sj-meal-swap');
+    if (swap && (swap.instead_of || swap.swap_to)) {
+      $('sj-meal-swap-from').textContent = swap.instead_of || '—';
+      $('sj-meal-swap-to').textContent = swap.swap_to || '—';
+      $('sj-meal-swap-why').textContent = swap.why || '';
+      swapEl.classList.remove('hidden');
+    } else { swapEl.classList.add('hidden'); }
+
+    // Components breakdown
+    const compDetails = $('sj-meal-components-details');
+    const compList = $('sj-meal-components');
+    if (Array.isArray(meal.components) && meal.components.length > 0) {
+      compList.innerHTML = meal.components.map(c => `
+        <li class="flex items-start justify-between gap-3 py-2 px-1 border-b border-forest-700/10 last:border-0">
+          <div class="min-w-0 flex-1">
+            <p class="text-forest-100 text-sm font-medium">${escape(c.name)}${c.portion ? ` <span class="text-forest-300/50 font-normal">· ${escape(c.portion)}</span>` : ''}</p>
+            ${c.notes ? `<p class="text-forest-300/45 text-[11px] mt-0.5">${escape(c.notes)}</p>` : ''}
+          </div>
+          <div class="text-right shrink-0">
+            <p class="text-forest-glow text-sm font-semibold">${c.calories_kcal || 0} kcal</p>
+            ${c.fats_g ? `<p class="text-forest-300/45 text-[11px]">${c.fats_g}g fat</p>` : ''}
+          </div>
+        </li>`).join('');
+      compDetails.classList.remove('hidden');
+    } else { compDetails.classList.add('hidden'); }
+
+    // Image
     if (imageDataUrl) {
       const placeholder = $('sj-meal-image-placeholder');
       const wrap = $('sj-meal-image-wrap');
@@ -3246,14 +3467,16 @@ If the image is not food, return {"error": "not_food"}.`;
       if (!img) {
         img = document.createElement('img');
         img.className = 'sj-card-img';
-        img.alt = meal.name;
+        img.alt = meal.name || 'Meal';
         img.style.cssText = 'position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0;';
         wrap.insertBefore(img, wrap.firstChild);
       }
       img.src = imageDataUrl;
+      img.alt = meal.name || 'Meal';
+      $('sj-meal-image-overlay')?.classList.remove('hidden');
     }
 
-    $('sj-scan-btn-label').textContent = 'Scan Another Meal';
+    $('sj-scan-btn-label').textContent = 'Scan another meal';
   }
 
   function hydrateFromState() {
@@ -3297,21 +3520,59 @@ If the image is not food, return {"error": "not_food"}.`;
   }
 
   // ---- Analyze flow ----
+  function showResultView(meal, imageDataUrl) {
+    $('sj-result-name').textContent = meal.name || 'Meal';
+    $('sj-result-description').textContent = meal.description || (meal.cooking_method && meal.cooking_method !== 'mixed' ? meal.cooking_method.replace(/-/g,' ') : '');
+    $('sj-result-image').src = imageDataUrl || '';
+    $('sj-result-image').alt = meal.name || 'Meal';
+    $('sj-result-kcal').textContent = String(meal.calories_kcal || 0);
+    $('sj-result-carbs').textContent = String(meal.carbs_g || 0);
+    $('sj-result-protein').textContent = String(meal.protein_g || 0);
+    $('sj-result-fats').textContent = String(meal.fats_g || 0);
+
+    const verdict = $('sj-result-verdict');
+    verdict.textContent = meal.verdict || '—';
+    verdict.className = 'shrink-0 px-3 py-1 rounded-full backdrop-blur text-xs font-bold ';
+    if (meal.verdict === 'Healthy') verdict.className += 'bg-forest-glow/30 text-white';
+    else if (meal.verdict === 'Moderate') verdict.className += 'bg-yellow-400/25 text-white';
+    else if (meal.verdict === 'Indulgent') verdict.className += 'bg-red-400/30 text-white';
+    else verdict.className += 'bg-white/15 text-white';
+
+    const swap = meal.smart_swap;
+    const swapEl = $('sj-result-swap');
+    if (swap && (swap.instead_of || swap.swap_to)) {
+      $('sj-result-swap-from').textContent = swap.instead_of || '—';
+      $('sj-result-swap-to').textContent = swap.swap_to || '—';
+      swapEl.classList.remove('hidden');
+    } else { swapEl.classList.add('hidden'); }
+
+    // Toggle screens inside dialog: hide capture UI, show result view
+    $('sj-camera-view').style.display = 'none';
+    $('sj-controls').style.display = 'none';
+    $('sj-status').parentElement.style.display = 'none';
+    $('sj-result-view').style.display = '';
+  }
+
+  function showCaptureView() {
+    $('sj-camera-view').style.display = '';
+    $('sj-controls').style.display = '';
+    $('sj-status').parentElement.style.display = '';
+    $('sj-result-view').style.display = 'none';
+  }
+
   async function runAnalyze() {
     if (!capturedDataUrl) return;
     setAnalyzing(true);
     const useAI = GEMINI_API_KEY || USE_PROXY;
-    setStatus(useAI ? 'Sending to Gemini Vision…' : 'No API key — running demo analysis…', '');
+    setStatus(useAI ? 'Reading the plate…' : 'No API key — running demo analysis…', '');
     try {
       const meal = useAI ? await analyzeWithGemini(capturedDataUrl) : await new Promise(r => setTimeout(() => r(demoAnalyze()), 900));
       meal.imageDataUrl = capturedDataUrl;
       const saved = logMeal(meal);
       renderMeal(saved, capturedDataUrl);
-      setStatus(`Analyzed: ${meal.name} · ${meal.calories_kcal} kcal`, 'ok');
+      setAnalyzing(false);
+      showResultView(saved, capturedDataUrl);
       toast(`Saved: ${meal.name} (${meal.calories_kcal} kcal)`);
-      setTimeout(closeScanner, 700);
-      // Scroll the scanner card into view so the user sees the update
-      document.getElementById('scanner')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch (err) {
       console.error(err);
       setStatus(err.message || 'Analysis failed. Try again.', 'error');
@@ -3397,6 +3658,15 @@ If the image is not food, return {"error": "not_food"}.`;
       }
     });
     $('sj-analyze').addEventListener('click', runAnalyze);
+
+    $('sj-result-scan-another')?.addEventListener('click', () => {
+      resetToCapture();
+      if (currentTab === 'camera') startCamera();
+    });
+    $('sj-result-done')?.addEventListener('click', () => {
+      closeScanner();
+      document.getElementById('scanner')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     $('sj-view-history').addEventListener('click', (e) => { e.preventDefault(); openHistory(); });
     $('sj-history-close').addEventListener('click', closeHistory);
