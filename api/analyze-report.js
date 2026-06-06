@@ -101,41 +101,47 @@ export default async function handler(req, res) {
   // Size cap (~14 MB base64 ≈ 10 MB binary)
   if (b64.length > 14_000_000) return res.status(413).json({ error: 'file_too_large' });
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-  const body = {
-    contents: [{
-      parts: [
-        { text: finalPrompt },
-        { inline_data: { mime_type: mime, data: b64 } },
-      ],
-    }],
-    generationConfig: {
-      temperature: 0.2,
-      responseMimeType: 'application/json',
-      maxOutputTokens: 4096,
-      thinkingConfig: { thinkingBudget: 0 },
-    },
-  };
-
-  try {
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!r.ok) {
-      const errText = await r.text().catch(() => '');
-      return res.status(502).json({ error: 'gemini_error', status: r.status, detail: errText.slice(0, 300) });
-    }
+  // ---- Provider: Gemini (reads images AND PDFs) ----
+  async function callGemini() {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const body = {
+      contents: [{ parts: [{ text: finalPrompt }, { inline_data: { mime_type: mime, data: b64 } }] }],
+      generationConfig: { temperature: 0.2, responseMimeType: 'application/json', maxOutputTokens: 4096, thinkingConfig: { thinkingBudget: 0 } },
+    };
+    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!r.ok) { const t = await r.text().catch(() => ''); throw new Error(`gemini_http_${r.status}: ${t.slice(0, 200)}`); }
     const json = await r.json();
     const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    let parsed;
-    try { parsed = JSON.parse(text); }
-    catch { return res.status(502).json({ error: 'bad_model_response', detail: text.slice(0, 200) }); }
-
-    if (parsed.error === 'not_report') return res.status(422).json({ error: 'not_report' });
-    return res.status(200).json(normalize(parsed));
-  } catch (err) {
-    return res.status(500).json({ error: 'proxy_failure', detail: String(err.message || err) });
+    return JSON.parse(text);
   }
+
+  // ---- Provider: Groq / Llama 4 Scout (images only — cannot read PDFs) ----
+  async function callGroq() {
+    const groqKey = process.env.GROQ_API_KEY;
+    if (!groqKey) return null;
+    if (!mime.startsWith('image/')) return null;
+    const groqModel = process.env.GROQ_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct';
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${groqKey}` },
+      body: JSON.stringify({
+        model: groqModel, temperature: 0.2, max_tokens: 4096, response_format: { type: 'json_object' },
+        messages: [{ role: 'user', content: [{ type: 'text', text: finalPrompt }, { type: 'image_url', image_url: { url: `data:${mime};base64,${b64}` } }] }],
+      }),
+    });
+    if (!r.ok) { const t = await r.text().catch(() => ''); throw new Error(`groq_http_${r.status}: ${t.slice(0, 200)}`); }
+    const json = await r.json();
+    const text = json?.choices?.[0]?.message?.content || '';
+    return JSON.parse(text);
+  }
+
+  // Groq-first for images (free); Gemini handles PDFs + acts as fallback.
+  let parsed = null, lastErr = null;
+  try { parsed = await callGroq(); } catch (e) { lastErr = e; }
+  if (!parsed) { try { parsed = await callGemini(); } catch (e) { lastErr = e; } }
+  if (!parsed) {
+    return res.status(502).json({ error: 'gemini_error', detail: String((lastErr && lastErr.message) || 'no_response').slice(0, 300) });
+  }
+  if (parsed.error === 'not_report') return res.status(422).json({ error: 'not_report' });
+  return res.status(200).json(normalize(parsed));
 }

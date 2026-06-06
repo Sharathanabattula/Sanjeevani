@@ -227,13 +227,14 @@ export default async function handler(req, res) {
     return JSON.parse(text);
   }
 
-  // Try Gemini first; fall back to Groq (if configured) on any technical failure.
+  // Groq-first (free, higher limits); Gemini as fallback. If GROQ_API_KEY is
+  // unset, callGroq() returns null and we fall straight through to Gemini.
   let parsed = null;
   let lastErr = null;
-  try { parsed = await callGemini(); }
+  try { parsed = await callGroq(); }
   catch (e) { lastErr = e; }
   if (!parsed) {
-    try { parsed = await callGroq(); }
+    try { parsed = await callGemini(); }
     catch (e) { lastErr = e; }
   }
   if (!parsed) {
