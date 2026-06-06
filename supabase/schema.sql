@@ -29,9 +29,19 @@ create table if not exists sanjeevani.profiles (
   goals jsonb default '[]'::jsonb,
   conditions jsonb default '[]'::jsonb,
   is_vegetarian boolean,
+  age int,
+  gender text,
+  height_cm numeric,
+  weight_kg numeric,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+-- Body metrics added after initial launch — additive, safe on existing rows.
+alter table sanjeevani.profiles add column if not exists age int;
+alter table sanjeevani.profiles add column if not exists gender text;
+alter table sanjeevani.profiles add column if not exists height_cm numeric;
+alter table sanjeevani.profiles add column if not exists weight_kg numeric;
 
 drop trigger if exists set_profiles_updated_at on sanjeevani.profiles;
 create trigger set_profiles_updated_at before update on sanjeevani.profiles

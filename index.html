@@ -681,6 +681,58 @@ tailwind.config = {
   }
   .profile-switch.on { background: linear-gradient(135deg, #1B5E20, #4CAF50); }
   .profile-switch.on::after { transform: translateX(20px); }
+  /* ---- About-you / body metrics ---- */
+  .pf-field { margin-bottom: 14px; }
+  .pf-field:last-child { margin-bottom: 0; }
+  .pf-field-label {
+    color: rgba(220, 240, 224, 0.55);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .pf-input {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 12px;
+    background: rgba(76, 175, 80, 0.06);
+    border: 1px solid rgba(76, 175, 80, 0.16);
+    color: #f0f5f1;
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    -moz-appearance: textfield;
+  }
+  .pf-input::-webkit-outer-spin-button, .pf-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .pf-input::placeholder { color: rgba(220, 240, 224, 0.30); }
+  .pf-input:focus { outline: none; border-color: rgba(0, 230, 118, 0.45); background: rgba(76, 175, 80, 0.10); }
+  .pf-row { display: flex; gap: 12px; }
+  .pf-row > .pf-field { flex: 1 1 0; }
+  .pf-input-suffix { position: relative; }
+  .pf-input-suffix .pf-suffix {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    color: rgba(220, 240, 224, 0.40); font-size: 12px; pointer-events: none; font-weight: 500;
+  }
+  .pf-units { display: inline-flex; gap: 4px; padding: 3px; border-radius: 999px; background: rgba(76, 175, 80, 0.08); border: 1px solid rgba(76, 175, 80, 0.14); }
+  .pf-unit-btn {
+    padding: 3px 12px; border-radius: 999px; font-size: 11px; font-weight: 600;
+    color: rgba(220, 240, 224, 0.55); cursor: pointer; border: none; background: transparent;
+    transition: all 0.15s ease; user-select: none;
+  }
+  .pf-unit-btn.active { background: linear-gradient(135deg, #1B5E20, #2E7D32); color: #fff; }
+  .pf-ht-imperial { display: flex; gap: 8px; }
+  .bmi-card {
+    margin-top: 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 14px 16px; border-radius: 14px;
+    background: rgba(76, 175, 80, 0.06); border: 1px solid rgba(76, 175, 80, 0.14);
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .bmi-card .bmi-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 30px; line-height: 1; color: #fff; }
+  .bmi-card .bmi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(220,240,224,0.45); margin-top: 4px; }
+  .bmi-card .bmi-cat { font-weight: 700; font-size: 14px; }
+  .bmi-card .bmi-cat-sub { font-size: 11px; color: rgba(220,240,224,0.45); margin-top: 2px; text-align: right; }
+  .bmi-card.is-empty .bmi-num { color: rgba(220,240,224,0.30); }
   .profile-footer {
     padding: 16px 24px;
     border-top: 1px solid rgba(76, 175, 80, 0.10);
@@ -1879,6 +1931,15 @@ tailwind.config = {
             <p id="dash-insight" class="text-forest-200/70 text-sm leading-relaxed">Scan your first meal to start seeing insights here.</p>
           </div>
         </div>
+
+        <!-- Share daily report -->
+        <button id="dash-share-report" type="button"
+          class="relative mt-6 w-full flex items-center justify-center gap-2.5 py-4 rounded-2xl font-display font-bold text-base text-forest-950 bg-forest-glow hover:bg-forest-neon focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-glow active:scale-[0.99] transition disabled:cursor-wait"
+          style="box-shadow: 0 14px 34px -12px rgba(0,230,118,0.55); transition-property: transform, background-color;">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M12 3v13"/><path d="m7 8 5-5 5 5"/></svg>
+          Share today's report
+        </button>
+        <p class="text-center text-forest-300/40 text-xs mt-2">A shareable image for WhatsApp, Instagram &amp; Snap</p>
       </div>
     </div>
   </div>
@@ -2641,6 +2702,75 @@ tailwind.config = {
         </div>
       </div>
 
+      <!-- About you (age, gender, BMI) -->
+      <div class="profile-section">
+        <div class="profile-label"><span>👤 About you</span></div>
+        <div class="pf-row">
+          <div class="pf-field">
+            <div class="pf-field-label"><span>Age</span></div>
+            <div class="pf-input-suffix">
+              <input id="profile-age" class="pf-input" type="number" inputmode="numeric" min="1" max="120" placeholder="e.g. 28">
+              <span class="pf-suffix">yrs</span>
+            </div>
+          </div>
+          <div class="pf-field">
+            <div class="pf-field-label"><span>Gender</span></div>
+            <div id="profile-gender" class="profile-chips" data-field="gender">
+              <button type="button" class="profile-chip" data-value="female">Female</button>
+              <button type="button" class="profile-chip" data-value="male">Male</button>
+              <button type="button" class="profile-chip" data-value="other">Other</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pf-field" style="margin-top:16px">
+          <div class="pf-field-label">
+            <span>Height &amp; weight</span>
+            <span class="pf-units" id="profile-units" role="group" aria-label="Units">
+              <button type="button" class="pf-unit-btn active" data-unit="metric">cm / kg</button>
+              <button type="button" class="pf-unit-btn" data-unit="imperial">ft / lb</button>
+            </span>
+          </div>
+          <div class="pf-row">
+            <!-- Height (metric) -->
+            <div class="pf-field" data-unit-group="metric">
+              <div class="pf-input-suffix">
+                <input id="profile-height-cm" class="pf-input" type="number" inputmode="decimal" min="50" max="250" placeholder="Height">
+                <span class="pf-suffix">cm</span>
+              </div>
+            </div>
+            <!-- Height (imperial) -->
+            <div class="pf-field pf-ht-imperial" data-unit-group="imperial" style="display:none">
+              <div class="pf-input-suffix" style="flex:1">
+                <input id="profile-height-ft" class="pf-input" type="number" inputmode="numeric" min="1" max="8" placeholder="ft">
+                <span class="pf-suffix">ft</span>
+              </div>
+              <div class="pf-input-suffix" style="flex:1">
+                <input id="profile-height-in" class="pf-input" type="number" inputmode="numeric" min="0" max="11" placeholder="in">
+                <span class="pf-suffix">in</span>
+              </div>
+            </div>
+            <!-- Weight (shared field; unit label flips) -->
+            <div class="pf-field">
+              <div class="pf-input-suffix">
+                <input id="profile-weight" class="pf-input" type="number" inputmode="decimal" min="10" max="400" placeholder="Weight">
+                <span class="pf-suffix" id="profile-weight-unit">kg</span>
+              </div>
+            </div>
+          </div>
+          <div id="profile-bmi-card" class="bmi-card is-empty">
+            <div>
+              <div class="bmi-num" id="profile-bmi-num">—</div>
+              <div class="bmi-label">Your BMI</div>
+            </div>
+            <div>
+              <div class="bmi-cat" id="profile-bmi-cat" style="color:rgba(220,240,224,0.45)">Enter height &amp; weight</div>
+              <div class="bmi-cat-sub" id="profile-bmi-sub">Auto-calculated</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Goals -->
       <div class="profile-section">
         <div class="profile-label">
@@ -3058,19 +3188,26 @@ const SANJEEVANI = (() => {
     return canvas.toDataURL('image/jpeg', JPEG_QUALITY);
   }
   async function fileToDataUrl(file) {
+    if (file && file.size > 25 * 1024 * 1024) {
+      throw new Error('That image is very large (over 25 MB). Try a smaller photo.');
+    }
     // Down-scale via canvas
+    const objectUrl = URL.createObjectURL(file);
     const img = await new Promise((res, rej) => {
       const i = new Image();
       i.onload = () => res(i);
-      i.onerror = rej;
-      i.src = URL.createObjectURL(file);
+      i.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        rej(new Error('Couldn’t read this photo — it may be an unsupported format (e.g. iPhone HEIC). Try a JPG/PNG, or use the in-app camera.'));
+      };
+      i.src = objectUrl;
     });
     const canvas = $('sj-canvas');
     const scale = Math.min(1, MAX_IMAGE_DIM / Math.max(img.width, img.height));
     canvas.width = Math.round(img.width * scale);
     canvas.height = Math.round(img.height * scale);
     canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-    URL.revokeObjectURL(img.src);
+    URL.revokeObjectURL(objectUrl);
     return canvas.toDataURL('image/jpeg', JPEG_QUALITY);
   }
   function showPreview(dataUrl) {
@@ -3131,21 +3268,49 @@ Return ONLY valid minified JSON (no markdown):
 {"name":"string","description":"string<=80","cooking_method":"deep-fried|shallow-fried|tempered|tandoor|steamed|boiled|raw|restaurant-style|home-style|street-food|mixed","hidden_oil_tsp":number,"components":[{"name":"string","portion":"string","calories_kcal":number,"fats_g":number,"notes":"string<=60"}],"calories_kcal":number,"carbs_g":number,"fiber_g":number,"protein_g":number,"fats_g":number,"saturated_fats_g":number,"verdict":"Healthy|Moderate|Indulgent","verdict_reason":"string<=70","suggestion":"string<=25 words","smart_swap":{"instead_of":"string","swap_to":"string","why":"string<=90 (quantified)"}}
 If not food: {"error":"not_food"}.`;
 
+  // Fetch wrapper with an abort timeout so the scanner can never spin forever.
+  async function fetchWithTimeout(url, options, ms = 45000) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), ms);
+    try {
+      return await fetch(url, { ...options, signal: ctrl.signal });
+    } catch (e) {
+      if (e && e.name === 'AbortError') {
+        throw new Error('The AI took too long to respond. Check your connection and try again.');
+      }
+      throw new Error('Network error — could not reach the AI. Check your connection and try again.');
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  // Translate a failed response into a clear, human message.
+  function mapVisionError(status, err) {
+    const code = err && err.error;
+    if (code === 'not_food') return 'That doesn’t look like food. Try a clearer photo of your meal.';
+    if (code === 'image_too_large' || status === 413) return 'That photo is too large. Try a smaller image or use the in-app camera.';
+    if (code === 'server_misconfigured') return 'The AI isn’t set up on the server yet (missing API key). Please contact the site owner.';
+    if (status === 404) return 'AI service unavailable. If you’re running this site locally, the scanner only works on the deployed site (the AI runs as a serverless function) — or add a Gemini key to config.local.js.';
+    if (status === 429) return 'The AI is busy right now. Wait a few seconds and try again.';
+    if (code === 'gemini_error' || code === 'bad_model_response' || code === 'proxy_failure' || status === 502 || status === 500) return 'The AI service hiccuped. Please try again in a moment.';
+    return (err && err.detail) ? String(err.detail).slice(0, 140) : `Analysis failed (error ${status}). Please try again.`;
+  }
+
   async function analyzeWithGemini(dataUrl) {
     const base64 = dataUrl.split(',')[1];
 
     // Production path: proxy through /api/gemini-vision (server holds the key).
     if (USE_PROXY) {
       const profile = (loadState && loadState().profile) || (window.SANJEEVANI_PROFILE?.get?.() || null);
-      const res = await fetch('/api/gemini-vision', {
+      const res = await fetchWithTimeout('/api/gemini-vision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image_base64: base64, mime_type: 'image/jpeg', profile }),
-      });
+      }, 45000);
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        if (err.error === 'not_food') throw new Error('That doesn\'t look like food. Try a clearer photo of your meal.');
-        throw new Error(err.detail || `Vision API ${res.status}`);
+        // Body may be JSON (from the proxy) or HTML/text (e.g. a 404 from a static dev server).
+        const err = await res.json().catch(() => null);
+        throw new Error(mapVisionError(res.status, err));
       }
       // The proxy already returns the normalized shape.
       return await res.json();
@@ -3167,11 +3332,11 @@ If not food: {"error":"not_food"}.`;
         thinkingConfig: { thinkingBudget: 0 },
       },
     };
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-    });
+    }, 45000);
     if (!res.ok) {
       const errText = await res.text().catch(() => '');
       throw new Error(`Gemini API ${res.status}: ${errText.slice(0, 200)}`);
@@ -3552,7 +3717,7 @@ If not food: {"error":"not_food"}.`;
         const url = await fileToDataUrl(f);
         showPreview(url);
       } catch (err) {
-        setStatus('Could not read image: ' + err.message, 'error');
+        setStatus(err.message || 'Could not read that image. Try a JPG or PNG.', 'error');
       } finally {
         e.target.value = '';
       }
@@ -3699,8 +3864,22 @@ const SANJEEVANI_COACH = (() => {
     const dietText = profile.is_vegetarian === true ? 'vegetarian'
       : profile.is_vegetarian === false ? 'eats meat/fish' : 'unspecified';
 
-    const profileBlock = (goalText || condText || profile.is_vegetarian !== null && profile.is_vegetarian !== undefined)
+    const numP = (v) => (v != null && isFinite(Number(v)) ? Number(v) : null);
+    const ageV = numP(profile.age), hCm = numP(profile.height_cm), wKg = numP(profile.weight_kg);
+    const genderV = typeof profile.gender === 'string' ? profile.gender : null;
+    const bodyParts = [];
+    if (ageV) bodyParts.push(`${ageV} yrs`);
+    if (genderV) bodyParts.push(genderV);
+    if (hCm && wKg && hCm > 0) {
+      const m = hCm / 100, bmi = Math.round((wKg / (m * m)) * 10) / 10;
+      const cat = bmi < 18.5 ? 'underweight' : bmi < 25 ? 'healthy' : bmi < 30 ? 'overweight' : 'obese';
+      bodyParts.push(`BMI ${bmi} (${cat}), ${hCm}cm / ${wKg}kg`);
+    }
+    const bodyText = bodyParts.join(', ');
+
+    const profileBlock = (goalText || condText || bodyText || (profile.is_vegetarian !== null && profile.is_vegetarian !== undefined))
       ? `USER PROFILE (use this to personalize every reply):
+- Body: ${bodyText || '(not set)'}
 - Goals: ${goalText || '(none set)'}
 - Health conditions: ${condText || '(none reported)'}
 - Diet: ${dietText}
@@ -3719,6 +3898,7 @@ Rules:
 - Ground every claim in the user's logged data when relevant. Cite numbers ("you've had ~${todaysKcal} kcal today").
 - End most replies with ONE concrete, doable next step the user can take in the next hour.
 - Tailor advice to the user's GOALS and CONDITIONS below. If they have diabetes, prioritize low-GI suggestions. If they're pregnant, emphasize iron + folate. If they're vegetarian, never suggest meat/fish — use paneer, dal, eggs (if not stated otherwise), soy, tofu, hemp.
+- Factor in the user's age, gender and BMI when giving calorie/protein targets. If BMI is overweight/obese, favor satiety and a gentle deficit; if underweight, favor nutrient-dense additions. Never shame body weight — be encouraging and matter-of-fact.
 - If the user asks for medical diagnosis or prescription advice, recommend they consult a doctor — do not diagnose.
 - Never recommend extreme diets, fasting longer than 18h, or extreme cardio.
 - If the user logs something concerning (very low calories, signs of an eating disorder, suicidal ideation), respond with care and recommend professional help (e.g. iCall India 9152987821).
@@ -4383,7 +4563,9 @@ const SANJEEVANI_PROFILE = (() => {
 
   let currentUserId = null;
   let currentUserMeta = null;
-  let cachedProfile = { goals: [], conditions: [], is_vegetarian: null };
+  const EMPTY_PROFILE = { goals: [], conditions: [], is_vegetarian: null, age: null, gender: null, height_cm: null, weight_kg: null };
+  let cachedProfile = { ...EMPTY_PROFILE };
+  let currentUnit = 'metric'; // 'metric' | 'imperial'
 
   const sb = () => window.SANJEEVANI_SB;
   const $ = (id) => document.getElementById(id);
@@ -4391,14 +4573,19 @@ const SANJEEVANI_PROFILE = (() => {
   async function pull() {
     if (!currentUserId) return;
     const { data, error } = await sb().schema(SCHEMA).from(TABLE)
-      .select('goals, conditions, is_vegetarian, full_name, avatar_url')
+      .select('goals, conditions, is_vegetarian, age, gender, height_cm, weight_kg, full_name, avatar_url')
       .eq('id', currentUserId)
       .maybeSingle();
     if (error) { console.error('[Profile] pull error:', error); return; }
+    const numOrNull = (v) => (v != null && isFinite(Number(v)) ? Number(v) : null);
     cachedProfile = {
       goals: Array.isArray(data?.goals) ? data.goals : [],
       conditions: Array.isArray(data?.conditions) ? data.conditions : [],
       is_vegetarian: typeof data?.is_vegetarian === 'boolean' ? data.is_vegetarian : null,
+      age: numOrNull(data?.age),
+      gender: typeof data?.gender === 'string' ? data.gender : null,
+      height_cm: numOrNull(data?.height_cm),
+      weight_kg: numOrNull(data?.weight_kg),
     };
     SANJEEVANI.patchState({ profile: cachedProfile });
     try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
@@ -4411,23 +4598,131 @@ const SANJEEVANI_PROFILE = (() => {
       goals: values.goals || [],
       conditions: values.conditions || [],
       is_vegetarian: typeof values.is_vegetarian === 'boolean' ? values.is_vegetarian : null,
+      age: values.age != null ? values.age : null,
+      gender: values.gender || null,
+      height_cm: values.height_cm != null ? values.height_cm : null,
+      weight_kg: values.weight_kg != null ? values.weight_kg : null,
       email: currentUserMeta?.email || null,
       full_name: currentUserMeta?.user_metadata?.full_name || currentUserMeta?.user_metadata?.name || null,
       avatar_url: currentUserMeta?.user_metadata?.avatar_url || currentUserMeta?.user_metadata?.picture || null,
     };
     const { error } = await sb().schema(SCHEMA).from(TABLE).upsert(payload, { onConflict: 'id' });
     if (error) { console.error('[Profile] save error:', error); return false; }
-    cachedProfile = { goals: payload.goals, conditions: payload.conditions, is_vegetarian: payload.is_vegetarian };
+    cachedProfile = {
+      goals: payload.goals, conditions: payload.conditions, is_vegetarian: payload.is_vegetarian,
+      age: payload.age, gender: payload.gender, height_cm: payload.height_cm, weight_kg: payload.weight_kg,
+    };
     SANJEEVANI.patchState({ profile: cachedProfile });
     try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
     return true;
+  }
+
+  // ---- Body metrics helpers ----
+  const numVal = (id) => { const v = parseFloat($(id)?.value); return isFinite(v) ? v : null; };
+
+  function readBodyMetrics() {
+    const ageRaw = numVal('profile-age');
+    const age = ageRaw != null ? Math.round(Math.max(1, Math.min(120, ageRaw))) : null;
+    const genderEl = document.querySelector('#profile-gender .profile-chip.active');
+    const gender = genderEl ? genderEl.dataset.value : null;
+
+    let height_cm = null;
+    if (currentUnit === 'metric') {
+      const cm = numVal('profile-height-cm');
+      height_cm = cm != null ? Math.round(cm * 10) / 10 : null;
+    } else {
+      const ft = numVal('profile-height-ft');
+      const inch = numVal('profile-height-in');
+      if (ft != null || inch != null) {
+        const totalIn = (ft || 0) * 12 + (inch || 0);
+        height_cm = totalIn > 0 ? Math.round(totalIn * 2.54 * 10) / 10 : null;
+      }
+    }
+
+    let weight_kg = null;
+    const w = numVal('profile-weight');
+    if (w != null) weight_kg = currentUnit === 'metric'
+      ? Math.round(w * 10) / 10
+      : Math.round(w * 0.453592 * 10) / 10;
+
+    return { age, gender, height_cm, weight_kg };
+  }
+
+  function bmiInfo(bmi) {
+    if (bmi < 18.5) return { cat: 'Underweight', color: '#69F0AE', sub: 'below healthy range' };
+    if (bmi < 25)   return { cat: 'Healthy',     color: '#00E676', sub: 'normal range' };
+    if (bmi < 30)   return { cat: 'Overweight',  color: '#F4B400', sub: 'above healthy range' };
+    return            { cat: 'Obese',       color: '#FF7043', sub: 'worth a doctor’s view' };
+  }
+  function computeBmi(height_cm, weight_kg) {
+    if (!height_cm || !weight_kg || height_cm <= 0) return null;
+    const m = height_cm / 100;
+    return weight_kg / (m * m);
+  }
+
+  function renderBmi() {
+    const { height_cm, weight_kg } = readBodyMetrics();
+    const card = $('profile-bmi-card'), numEl = $('profile-bmi-num');
+    const catEl = $('profile-bmi-cat'), subEl = $('profile-bmi-sub');
+    if (!card || !numEl) return;
+    const bmi = computeBmi(height_cm, weight_kg);
+    if (bmi) {
+      const info = bmiInfo(bmi);
+      numEl.textContent = (Math.round(bmi * 10) / 10).toFixed(1);
+      numEl.style.color = '#fff';
+      catEl.textContent = info.cat; catEl.style.color = info.color;
+      subEl.textContent = info.sub;
+      card.classList.remove('is-empty');
+      card.style.borderColor = info.color + '55';
+    } else {
+      numEl.textContent = '—'; numEl.style.color = '';
+      catEl.textContent = 'Enter height & weight'; catEl.style.color = 'rgba(220,240,224,0.45)';
+      subEl.textContent = 'Auto-calculated';
+      card.classList.add('is-empty'); card.style.borderColor = '';
+    }
+  }
+
+  function applyUnitToInputs(height_cm, weight_kg) {
+    document.querySelectorAll('[data-unit-group]').forEach(el => {
+      el.style.display = el.dataset.unitGroup === currentUnit ? '' : 'none';
+    });
+    const wUnit = $('profile-weight-unit'); if (wUnit) wUnit.textContent = currentUnit === 'metric' ? 'kg' : 'lb';
+    document.querySelectorAll('#profile-units .pf-unit-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.unit === currentUnit);
+    });
+    if (currentUnit === 'metric') {
+      if ($('profile-height-cm')) $('profile-height-cm').value = height_cm != null ? (Math.round(height_cm * 10) / 10) : '';
+      if ($('profile-weight'))    $('profile-weight').value    = weight_kg != null ? (Math.round(weight_kg * 10) / 10) : '';
+    } else {
+      if (height_cm != null) {
+        const totalIn = height_cm / 2.54;
+        const ft = Math.floor(totalIn / 12);
+        let inch = Math.round(totalIn - ft * 12);
+        let ftAdj = ft;
+        if (inch === 12) { ftAdj += 1; inch = 0; }
+        if ($('profile-height-ft')) $('profile-height-ft').value = ftAdj;
+        if ($('profile-height-in')) $('profile-height-in').value = inch;
+      } else {
+        if ($('profile-height-ft')) $('profile-height-ft').value = '';
+        if ($('profile-height-in')) $('profile-height-in').value = '';
+      }
+      if ($('profile-weight')) $('profile-weight').value = weight_kg != null ? Math.round(weight_kg / 0.453592) : '';
+    }
+  }
+
+  function setUnit(unit) {
+    if (unit === currentUnit) return;
+    const { height_cm, weight_kg } = readBodyMetrics(); // canonical, read in old unit
+    currentUnit = unit;
+    applyUnitToInputs(height_cm, weight_kg);
+    renderBmi();
   }
 
   function readUiValues() {
     const goals = Array.from(document.querySelectorAll('#profile-goals .profile-chip.active')).map(c => c.dataset.value);
     const conditions = Array.from(document.querySelectorAll('#profile-conditions .profile-chip.active')).map(c => c.dataset.value);
     const veg = $('profile-veg-switch')?.classList.contains('on') || false;
-    return { goals, conditions, is_vegetarian: veg };
+    return { goals, conditions, is_vegetarian: veg, ...readBodyMetrics() };
   }
 
   function writeUiValues(p) {
@@ -4443,6 +4738,13 @@ const SANJEEVANI_PROFILE = (() => {
       sw.classList.toggle('on', on);
       sw.setAttribute('aria-pressed', String(on));
     }
+    // About-you fields
+    if ($('profile-age')) $('profile-age').value = p.age != null ? p.age : '';
+    document.querySelectorAll('#profile-gender .profile-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.value === p.gender);
+    });
+    applyUnitToInputs(p.height_cm, p.weight_kg);
+    renderBmi();
   }
 
   function renderIdentity() {
@@ -4510,6 +4812,22 @@ const SANJEEVANI_PROFILE = (() => {
       sw.classList.toggle('on', on);
       sw.setAttribute('aria-pressed', String(on));
     });
+    // Gender: single-select (clicking the active chip clears it)
+    document.querySelectorAll('#profile-gender .profile-chip').forEach(c => {
+      c.addEventListener('click', () => {
+        const wasActive = c.classList.contains('active');
+        document.querySelectorAll('#profile-gender .profile-chip').forEach(x => x.classList.remove('active'));
+        if (!wasActive) c.classList.add('active');
+      });
+    });
+    // Units toggle
+    document.querySelectorAll('#profile-units .pf-unit-btn').forEach(b => {
+      b.addEventListener('click', () => setUnit(b.dataset.unit));
+    });
+    // Live BMI as the user types
+    ['profile-age', 'profile-height-cm', 'profile-height-ft', 'profile-height-in', 'profile-weight'].forEach(id => {
+      $(id)?.addEventListener('input', renderBmi);
+    });
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-profile-open]');
       if (btn) { e.preventDefault(); open(); }
@@ -4525,7 +4843,7 @@ const SANJEEVANI_PROFILE = (() => {
   function onSignOut() {
     currentUserId = null;
     currentUserMeta = null;
-    cachedProfile = { goals: [], conditions: [], is_vegetarian: null };
+    cachedProfile = { ...EMPTY_PROFILE };
     SANJEEVANI.patchState({ profile: cachedProfile });
   }
 
@@ -4549,7 +4867,13 @@ const SANJEEVANI_PROFILE = (() => {
     init();
   }
 
-  return { open, close, get: () => cachedProfile, _GOAL_LABELS: GOAL_LABELS, _CONDITION_LABELS: CONDITION_LABELS };
+  return {
+    open, close,
+    get: () => cachedProfile,
+    bmi: () => computeBmi(cachedProfile.height_cm, cachedProfile.weight_kg),
+    bmiInfo,
+    _GOAL_LABELS: GOAL_LABELS, _CONDITION_LABELS: CONDITION_LABELS,
+  };
 })();
 window.SANJEEVANI_PROFILE = SANJEEVANI_PROFILE;
 
@@ -4752,6 +5076,252 @@ const SANJEEVANI_DASH = (() => {
   return { render };
 })();
 window.SANJEEVANI_DASH = SANJEEVANI_DASH;
+
+
+/* ==================== SANJEEVANI DAILY REPORT (shareable image) ==================== */
+const SANJEEVANI_REPORT = (() => {
+  const W = 1080, H = 1920;
+  const C = {
+    bg0: '#020A02', bg1: '#051205', bg2: '#0A1F0A',
+    glow: '#00E676', neon: '#69F0AE', haldi: '#F4B400', coral: '#FF7043',
+    white: '#FFFFFF', mute: 'rgba(220,240,224,0.60)', faint: 'rgba(220,240,224,0.34)',
+    card: 'rgba(76,175,80,0.08)',
+  };
+  const TARGETS = { kcal: 2000, protein: 60, fiber: 30 };
+  const HEAD = "'Syne', system-ui, sans-serif";
+  const BODY = "'Plus Jakarta Sans', system-ui, sans-serif";
+
+  function rr(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  function ellipsize(ctx, str, maxW) {
+    str = String(str || '');
+    if (ctx.measureText(str).width <= maxW) return str;
+    let s = str;
+    while (s.length > 1 && ctx.measureText(s + '…').width > maxW) s = s.slice(0, -1);
+    return s + '…';
+  }
+  function verdictColor(v) {
+    return v === 'Healthy' ? C.glow : v === 'Moderate' ? C.haldi : v === 'Indulgent' ? C.coral : C.mute;
+  }
+  function todayMeals() {
+    const meals = (SANJEEVANI.loadState().meals) || [];
+    const today = new Date().toDateString();
+    return meals.filter(m => new Date(m.timestamp).toDateString() === today);
+  }
+  function userName() {
+    const el = document.getElementById('dash-name');
+    if (el && el.textContent) {
+      const n = el.textContent.replace(/[👋!]/g, '').trim();
+      if (n && !/^friend/i.test(n)) return n.split(' ')[0];
+    }
+    return 'My';
+  }
+  function healthScore(today) {
+    if (!today.length) return 0;
+    const sum = (k) => today.reduce((a, m) => a + (Number(m[k]) || 0), 0);
+    const protein = sum('protein_g'), fiber = sum('fiber_g'), kcal = sum('calories_kcal');
+    let s = 50;
+    s += Math.min(20, (protein / TARGETS.protein) * 20);
+    s += Math.min(15, (fiber / TARGETS.fiber) * 15);
+    const r = kcal / TARGETS.kcal;
+    if (r > 0.6 && r < 1.2) s += 15;
+    s += Math.min(10, today.filter(m => m.verdict === 'Healthy').length * 5);
+    s -= today.filter(m => m.verdict === 'Indulgent').length * 5;
+    return Math.max(0, Math.min(100, Math.round(s)));
+  }
+
+  async function renderCard(today) {
+    try { await document.fonts.ready; } catch (_) {}
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    const PAD = 80, barW = W - PAD * 2, cx = W / 2;
+
+    // ---- Background ----
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, C.bg0); bg.addColorStop(0.5, C.bg1); bg.addColorStop(1, C.bg2);
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    const rg = ctx.createRadialGradient(cx, 420, 60, cx, 420, 760);
+    rg.addColorStop(0, 'rgba(0,230,118,0.18)'); rg.addColorStop(1, 'rgba(0,230,118,0)');
+    ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+
+    const sum = (k) => Math.round(today.reduce((a, m) => a + (Number(m[k]) || 0), 0));
+    const kcal = sum('calories_kcal'), protein = sum('protein_g'), carbs = sum('carbs_g'),
+          fats = sum('fats_g'), fiber = sum('fiber_g');
+
+    ctx.textBaseline = 'alphabetic';
+
+    // ---- Brand row ----
+    let y = 130;
+    ctx.textAlign = 'left';
+    ctx.font = `46px ${BODY}`;
+    ctx.fillText('🌿', PAD, y);
+    ctx.fillStyle = C.white;
+    ctx.font = `800 48px ${HEAD}`;
+    ctx.fillText('Sanjeevani', PAD + 66, y);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = C.mute;
+    ctx.font = `500 28px ${BODY}`;
+    const dateStr = new Date().toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+    ctx.fillText(dateStr, W - PAD, y - 6);
+    ctx.textAlign = 'left';
+
+    y += 16;
+    ctx.fillStyle = C.glow;
+    ctx.font = `700 24px ${BODY}`;
+    try { ctx.letterSpacing = '4px'; } catch (_) {}
+    ctx.fillText('DAILY NUTRITION REPORT', PAD, y + 28);
+    try { ctx.letterSpacing = '0px'; } catch (_) {}
+
+    // ---- Greeting ----
+    y += 110;
+    ctx.fillStyle = C.white;
+    ctx.font = `800 70px ${HEAD}`;
+    const name = userName();
+    ctx.fillText(name === 'My' ? 'My day' : `${name}'s day`, PAD, y);
+
+    // ---- Score ring ----
+    const score = healthScore(today);
+    const R = 158, cyR = y + 250;
+    ctx.lineWidth = 26; ctx.lineCap = 'round';
+    ctx.strokeStyle = 'rgba(255,255,255,0.09)';
+    ctx.beginPath(); ctx.arc(cx, cyR, R, 0, Math.PI * 2); ctx.stroke();
+    const grad = ctx.createLinearGradient(cx - R, cyR - R, cx + R, cyR + R);
+    grad.addColorStop(0, C.glow); grad.addColorStop(1, C.neon);
+    ctx.strokeStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cyR, R, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (score / 100));
+    ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.fillStyle = C.white; ctx.font = `800 116px ${HEAD}`;
+    ctx.fillText(String(score), cx, cyR + 26);
+    ctx.fillStyle = C.mute; ctx.font = `700 26px ${BODY}`;
+    try { ctx.letterSpacing = '3px'; } catch (_) {}
+    ctx.fillText('HEALTH SCORE', cx, cyR + 76);
+    try { ctx.letterSpacing = '0px'; } catch (_) {}
+
+    y = cyR + R + 78;
+    ctx.fillStyle = C.neon; ctx.font = `700 32px ${BODY}`;
+    ctx.fillText(`${today.length} meal${today.length > 1 ? 's' : ''} logged today`, cx, y);
+    ctx.textAlign = 'left';
+
+    // ---- Macro bars ----
+    y += 64;
+    function bar(label, val, target, unit, color) {
+      ctx.fillStyle = C.white; ctx.font = `700 31px ${BODY}`; ctx.textAlign = 'left';
+      ctx.fillText(label, PAD, y);
+      ctx.fillStyle = C.mute; ctx.font = `600 28px ${BODY}`; ctx.textAlign = 'right';
+      ctx.fillText(`${val}${unit} / ${target}${unit}`, W - PAD, y);
+      ctx.textAlign = 'left';
+      y += 24;
+      ctx.fillStyle = 'rgba(255,255,255,0.09)'; rr(ctx, PAD, y, barW, 18, 9); ctx.fill();
+      const pct = Math.max(0, Math.min(1, val / target));
+      const g = ctx.createLinearGradient(PAD, 0, PAD + barW, 0);
+      g.addColorStop(0, color); g.addColorStop(1, C.neon);
+      ctx.fillStyle = g; rr(ctx, PAD, y, Math.max(18, barW * pct), 18, 9); ctx.fill();
+      y += 58;
+    }
+    bar('Calories', kcal, TARGETS.kcal, '', C.glow);
+    bar('Protein', protein, TARGETS.protein, 'g', C.haldi);
+    bar('Fiber', fiber, TARGETS.fiber, 'g', '#7C4DFF');
+
+    // compact carbs/fats line
+    ctx.fillStyle = C.faint; ctx.font = `600 27px ${BODY}`; ctx.textAlign = 'left';
+    ctx.fillText(`Carbs ${carbs}g    ·    Fats ${fats}g`, PAD, y);
+    y += 52;
+
+    // ---- Meals list ----
+    ctx.fillStyle = C.faint; ctx.font = `700 24px ${BODY}`;
+    try { ctx.letterSpacing = '3px'; } catch (_) {}
+    ctx.fillText("TODAY'S MEALS", PAD, y);
+    try { ctx.letterSpacing = '0px'; } catch (_) {}
+    y += 38;
+
+    const rows = today.slice(0, 5);
+    for (const m of rows) {
+      const h = 96, pad = 16;
+      ctx.fillStyle = C.card; rr(ctx, PAD, y, barW, h - pad, 20); ctx.fill();
+      const midY = y + (h - pad) / 2;
+      ctx.fillStyle = verdictColor(m.verdict);
+      ctx.beginPath(); ctx.arc(PAD + 36, midY, 11, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = C.white; ctx.font = `700 33px ${BODY}`; ctx.textAlign = 'left';
+      ctx.fillText(ellipsize(ctx, m.name || 'Meal', barW - 360), PAD + 70, y + 36);
+      ctx.fillStyle = C.mute; ctx.font = `500 25px ${BODY}`;
+      ctx.fillText(`${m.protein_g || 0}g P · ${m.carbs_g || 0}g C · ${m.fats_g || 0}g F`, PAD + 70, y + 68);
+      ctx.textAlign = 'right'; ctx.fillStyle = C.neon; ctx.font = `800 38px ${HEAD}`;
+      ctx.fillText(`${m.calories_kcal || 0}`, W - PAD - 28, y + 42);
+      ctx.fillStyle = C.faint; ctx.font = `500 22px ${BODY}`;
+      ctx.fillText('kcal', W - PAD - 28, y + 70);
+      ctx.textAlign = 'left';
+      y += h;
+    }
+    if (today.length > 5) {
+      ctx.fillStyle = C.mute; ctx.font = `600 27px ${BODY}`;
+      ctx.fillText(`+ ${today.length - 5} more`, PAD, y + 12);
+    }
+
+    // ---- Footer (pinned) ----
+    ctx.textAlign = 'center';
+    ctx.fillStyle = C.glow; ctx.font = `700 30px ${BODY}`;
+    ctx.fillText('🌿 Scanned with Sanjeevani', cx, H - 96);
+    ctx.fillStyle = C.faint; ctx.font = `500 25px ${BODY}`;
+    ctx.fillText('sanjeevani-eosin.vercel.app', cx, H - 56);
+    ctx.textAlign = 'left';
+
+    return canvas;
+  }
+
+  async function shareToday() {
+    const today = todayMeals();
+    if (!today.length) {
+      window.SANJEEVANI?.toast?.('Scan a meal first to build today’s report 🍽');
+      return;
+    }
+    const btn = document.getElementById('dash-share-report');
+    const orig = btn ? btn.innerHTML : null;
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.65'; btn.innerHTML = 'Creating image…'; }
+    try {
+      const canvas = await renderCard(today);
+      const blob = await new Promise((res) => canvas.toBlob(res, 'image/png', 0.95));
+      if (!blob) throw new Error('toBlob failed');
+      const fname = `sanjeevani-report-${new Date().toISOString().slice(0, 10)}.png`;
+      const file = new File([blob], fname, { type: 'image/png' });
+      const shareData = { files: [file], title: 'My Sanjeevani report', text: 'My nutrition today, tracked with Sanjeevani 🌿' };
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share(shareData);
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = fname;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        window.SANJEEVANI?.toast?.('Report image saved — share it anywhere 🌿');
+      }
+    } catch (e) {
+      if (e && e.name === 'AbortError') { /* user dismissed the share sheet */ }
+      else { console.error('[Report]', e); window.SANJEEVANI?.toast?.('Could not create the report image. Try again.'); }
+    } finally {
+      if (btn && orig != null) { btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = orig; }
+    }
+  }
+
+  function init() {
+    document.getElementById('dash-share-report')?.addEventListener('click', shareToday);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  return { shareToday };
+})();
+window.SANJEEVANI_REPORT = SANJEEVANI_REPORT;
 
 
 /* ==================== SANJEEVANI WAITLIST ENGINE ==================== */

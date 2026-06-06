@@ -120,18 +120,31 @@ export default async function handler(req, res) {
   // validates shape and clamps strings before injecting into the prompt.
   const profileLines = (() => {
     if (!profile || typeof profile !== 'object') return null;
+    const num = (v) => (v != null && isFinite(Number(v)) ? Number(v) : null);
     const goals = Array.isArray(profile.goals) ? profile.goals.slice(0, 6).map(String) : [];
     const conds = Array.isArray(profile.conditions) ? profile.conditions.slice(0, 6).map(String) : [];
     const veg = profile.is_vegetarian === true ? 'vegetarian'
       : profile.is_vegetarian === false ? 'non-vegetarian' : null;
+    const age = num(profile.age);
+    const gender = typeof profile.gender === 'string' ? profile.gender.slice(0, 20) : null;
+    const h = num(profile.height_cm), w = num(profile.weight_kg);
+    let bmi = null, bmiCat = null;
+    if (h && w && h > 0) {
+      const m = h / 100;
+      bmi = Math.round((w / (m * m)) * 10) / 10;
+      bmiCat = bmi < 18.5 ? 'underweight' : bmi < 25 ? 'healthy' : bmi < 30 ? 'overweight' : 'obese';
+    }
     const out = [];
+    if (age) out.push(`Age: ${age}`);
+    if (gender) out.push(`Gender: ${gender}`);
+    if (bmi) out.push(`BMI: ${bmi} (${bmiCat})`);
     if (goals.length) out.push(`Goals: ${goals.join(', ').slice(0, 200)}`);
     if (conds.length) out.push(`Conditions: ${conds.join(', ').slice(0, 200)}`);
     if (veg) out.push(`Diet: ${veg}`);
     return out.length ? out.join(' · ') : null;
   })();
   const PROFILE_CONTEXT = profileLines
-    ? `The user has shared: ${profileLines}. Make the Smart Swap match these — e.g., low-GI for diabetes, iron+folate-rich for pregnancy, no meat/fish for vegetarian, lower sodium for high BP. If the meal directly contradicts a condition (e.g. deep-fried for a diabetic), call it out gently in verdict_reason.`
+    ? `The user has shared: ${profileLines}. Make the Smart Swap match these — e.g., low-GI for diabetes, iron+folate-rich for pregnancy, no meat/fish for vegetarian, lower sodium for high BP. If BMI is overweight/obese, gently favor lower-calorie, higher-satiety, higher-protein swaps; if underweight, do NOT push calorie cuts — favor nutrient-dense additions. If the meal directly contradicts a condition (e.g. deep-fried for a diabetic), call it out gently in verdict_reason.`
     : 'No user profile shared — give a generally healthier swap suited to typical Indian palates.';
 
   const finalPrompt = ANALYZE_PROMPT.replace('{PROFILE_CONTEXT}', PROFILE_CONTEXT);
@@ -144,23 +157,23 @@ export default async function handler(req, res) {
     return res.status(413).json({ error: 'image_too_large' });
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-  const body = {
-    contents: [{
-      parts: [
-        { text: finalPrompt },
-        { inline_data: { mime_type: mime, data: b64 } },
-      ],
-    }],
-    generationConfig: {
-      temperature: 0.35,
-      responseMimeType: 'application/json',
-      maxOutputTokens: 2048,
-      thinkingConfig: { thinkingBudget: 0 },
-    },
-  };
-
-  try {
+  // ---- Provider: Google Gemini (primary) ----
+  async function callGemini() {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const body = {
+      contents: [{
+        parts: [
+          { text: finalPrompt },
+          { inline_data: { mime_type: mime, data: b64 } },
+        ],
+      }],
+      generationConfig: {
+        temperature: 0.35,
+        responseMimeType: 'application/json',
+        maxOutputTokens: 2048,
+        thinkingConfig: { thinkingBudget: 0 },
+      },
+    };
     const r = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -168,19 +181,59 @@ export default async function handler(req, res) {
     });
     if (!r.ok) {
       const errText = await r.text().catch(() => '');
-      return res.status(502).json({ error: 'gemini_error', status: r.status, detail: errText.slice(0, 300) });
+      throw new Error(`gemini_http_${r.status}: ${errText.slice(0, 200)}`);
     }
     const json = await r.json();
     const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    let parsed;
-    try { parsed = JSON.parse(text); }
-    catch { return res.status(502).json({ error: 'bad_model_response', detail: text.slice(0, 200) }); }
-
-    if (parsed.error === 'not_food') {
-      return res.status(422).json({ error: 'not_food' });
-    }
-    return res.status(200).json(normalizeMeal(parsed));
-  } catch (err) {
-    return res.status(500).json({ error: 'proxy_failure', detail: String(err.message || err) });
+    return JSON.parse(text); // throws on non-JSON → triggers fallback
   }
+
+  // ---- Provider: Groq / Llama 4 Scout (open-source fallback) ----
+  // Dormant unless GROQ_API_KEY is set in the environment. OpenAI-compatible API.
+  async function callGroq() {
+    const groqKey = process.env.GROQ_API_KEY;
+    if (!groqKey) return null;
+    const groqModel = process.env.GROQ_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct';
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${groqKey}` },
+      body: JSON.stringify({
+        model: groqModel,
+        temperature: 0.35,
+        max_tokens: 2048,
+        response_format: { type: 'json_object' },
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: finalPrompt },
+            { type: 'image_url', image_url: { url: `data:${mime};base64,${b64}` } },
+          ],
+        }],
+      }),
+    });
+    if (!r.ok) {
+      const errText = await r.text().catch(() => '');
+      throw new Error(`groq_http_${r.status}: ${errText.slice(0, 200)}`);
+    }
+    const json = await r.json();
+    const text = json?.choices?.[0]?.message?.content || '';
+    return JSON.parse(text);
+  }
+
+  // Try Gemini first; fall back to Groq (if configured) on any technical failure.
+  let parsed = null;
+  let lastErr = null;
+  try { parsed = await callGemini(); }
+  catch (e) { lastErr = e; }
+  if (!parsed) {
+    try { parsed = await callGroq(); }
+    catch (e) { lastErr = e; }
+  }
+  if (!parsed) {
+    return res.status(502).json({ error: 'gemini_error', detail: String((lastErr && lastErr.message) || 'no_response').slice(0, 300) });
+  }
+  if (parsed.error === 'not_food') {
+    return res.status(422).json({ error: 'not_food' });
+  }
+  return res.status(200).json(normalizeMeal(parsed));
 }
