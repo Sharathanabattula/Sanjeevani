@@ -198,6 +198,41 @@ create policy "Conv: delete own" on sanjeevani.coach_conversations
   for delete using (auth.uid() = user_id);
 
 -- ============================================================
+-- DAILY_LOGS (one row per user per day: water, steps, sleep)
+-- ============================================================
+create table if not exists sanjeevani.daily_logs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users on delete cascade not null,
+  log_date date not null default current_date,
+  water_ml int default 0,
+  steps int default 0,
+  sleep_hours numeric default null,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  unique (user_id, log_date)
+);
+
+create index if not exists daily_logs_user_date_idx on sanjeevani.daily_logs(user_id, log_date desc);
+
+drop trigger if exists set_daily_logs_updated_at on sanjeevani.daily_logs;
+create trigger set_daily_logs_updated_at before update on sanjeevani.daily_logs
+  for each row execute function sanjeevani.set_updated_at();
+
+alter table sanjeevani.daily_logs enable row level security;
+
+drop policy if exists "Daily: read own" on sanjeevani.daily_logs;
+create policy "Daily: read own" on sanjeevani.daily_logs
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "Daily: insert own" on sanjeevani.daily_logs;
+create policy "Daily: insert own" on sanjeevani.daily_logs
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Daily: update own" on sanjeevani.daily_logs;
+create policy "Daily: update own" on sanjeevani.daily_logs
+  for update using (auth.uid() = user_id);
+
+-- ============================================================
 -- Expose schema to PostgREST (Supabase's REST API layer)
 -- ============================================================
 -- In Supabase Dashboard → Settings → API → "Exposed schemas",
