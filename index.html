@@ -2831,6 +2831,138 @@ tailwind.config = {
   </div>
 </dialog>
 
+<!-- ==================== SHARED MODAL STYLES (auth + onboarding) ==================== -->
+<style>
+  .sj-modal { border: none; padding: 0; background: transparent; color: #f0f5f1; max-width: 460px; width: 92vw; }
+  .sj-modal::backdrop { background: rgba(2,8,2,0.74); backdrop-filter: blur(6px); }
+  .sj-modal[open] { animation: sjModalIn 0.26s cubic-bezier(0.22,1,0.36,1); }
+  @keyframes sjModalIn { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+  .sj-modal-shell {
+    border-radius: 26px; padding: 28px;
+    background: linear-gradient(180deg, rgba(10,31,10,0.97), rgba(5,18,5,0.985));
+    border: 1px solid rgba(0,230,118,0.18);
+    box-shadow: 0 30px 80px -20px rgba(0,230,118,0.18), 0 10px 40px -10px rgba(0,0,0,0.6);
+  }
+  .sj-onb-dot { width: 8px; height: 8px; border-radius: 999px; background: rgba(76,175,80,0.28); transition: all .28s cubic-bezier(0.22,1,0.36,1); }
+  .sj-onb-dot.active { background: #00E676; width: 26px; }
+</style>
+
+<!-- ==================== AUTH DIALOG (Google + magic link) ==================== -->
+<dialog id="auth-dialog" class="sj-modal" aria-labelledby="auth-title">
+  <div class="sj-modal-shell">
+    <div class="flex items-start justify-between mb-1">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🌿</span>
+        <h2 id="auth-title" class="font-display font-bold text-2xl text-white">Welcome</h2>
+      </div>
+      <button id="auth-close" type="button" aria-label="Close" class="w-9 h-9 rounded-full bg-forest-800/50 hover:bg-forest-700/60 flex items-center justify-center text-forest-200/70 hover:text-white transition-colors">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <p class="text-forest-200/60 text-sm mb-6">Sign in to track your meals and get personalized health insights.</p>
+
+    <button id="auth-google" type="button" class="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white text-gray-800 font-semibold text-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest-glow active:scale-[0.99] transition">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.5-5.2l-6.2-5.2c-2.1 1.5-4.6 2.4-7.3 2.4-5.2 0-9.6-3.3-11.2-8l-6.5 5C9.6 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C40.9 35.5 44 30.2 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="flex items-center gap-3 my-5">
+      <div class="h-px flex-1 bg-forest-700/30"></div>
+      <span class="text-forest-300/40 text-xs uppercase tracking-wider">or</span>
+      <div class="h-px flex-1 bg-forest-700/30"></div>
+    </div>
+
+    <form id="auth-magic-form" class="space-y-3" novalidate>
+      <input id="auth-email" type="email" autocomplete="email" required placeholder="you@email.com"
+        class="w-full px-4 py-3 rounded-xl bg-forest-800/40 border border-forest-700/30 text-white placeholder:text-forest-300/30 focus:outline-none focus:border-forest-glow/50 transition">
+      <button id="auth-magic-btn" type="submit" class="w-full py-3 rounded-xl font-display font-bold text-forest-950 bg-forest-glow hover:bg-forest-neon active:scale-[0.99] transition">
+        Email me a magic link
+      </button>
+    </form>
+    <div id="auth-sent" style="display:none" class="text-center py-3">
+      <div class="text-3xl mb-2">✉️</div>
+      <p class="text-white font-semibold">Check your inbox</p>
+      <p class="text-forest-200/60 text-sm mt-1">We sent a one-click sign-in link to <span data-email class="text-forest-glow font-medium"></span>. Open it on this device.</p>
+    </div>
+    <p id="auth-msg" class="mt-3 text-center text-sm" style="display:none"></p>
+
+    <p class="text-forest-300/35 text-[11px] text-center mt-6 leading-relaxed">
+      Passwordless &amp; secure — nothing to remember. This is wellness guidance, not medical diagnosis.
+    </p>
+  </div>
+</dialog>
+
+<!-- ==================== ONBOARDING DIALOG (mandatory, minimal) ==================== -->
+<dialog id="onboarding-dialog" class="sj-modal" aria-labelledby="onb-title">
+  <div class="sj-modal-shell">
+    <div class="flex items-center justify-center gap-2 mb-6">
+      <span class="sj-onb-dot active" data-dot="1"></span>
+      <span class="sj-onb-dot" data-dot="2"></span>
+    </div>
+
+    <!-- Step 1: identity -->
+    <div data-onb-step="1">
+      <h2 id="onb-title" class="font-display font-bold text-2xl text-white mb-1">Welcome to Sanjeevani 🌿</h2>
+      <p class="text-forest-200/60 text-sm mb-6">A few quick details so your AI can give advice that actually fits you. Takes 20 seconds.</p>
+
+      <label for="onb-name" class="block text-forest-200/55 text-xs font-medium mb-1.5">Your name</label>
+      <input id="onb-name" type="text" autocomplete="name" placeholder="e.g. Sharath"
+        class="w-full mb-4 px-4 py-3 rounded-xl bg-forest-800/40 border border-forest-700/30 text-white placeholder:text-forest-300/30 focus:outline-none focus:border-forest-glow/50 transition">
+
+      <label for="onb-age" class="block text-forest-200/55 text-xs font-medium mb-1.5">Age</label>
+      <input id="onb-age" type="number" inputmode="numeric" min="1" max="120" placeholder="28"
+        class="w-full mb-4 px-4 py-3 rounded-xl bg-forest-800/40 border border-forest-700/30 text-white placeholder:text-forest-300/30 focus:outline-none focus:border-forest-glow/50 transition">
+
+      <label class="block text-forest-200/55 text-xs font-medium mb-1.5">Gender <span class="text-forest-300/30 font-normal">· helps tailor advice</span></label>
+      <div id="onb-gender" class="profile-chips mb-1">
+        <button type="button" class="profile-chip" data-value="female">Female</button>
+        <button type="button" class="profile-chip" data-value="male">Male</button>
+        <button type="button" class="profile-chip" data-value="other">Other</button>
+      </div>
+
+      <p id="onb-err-1" class="text-red-300 text-sm mt-3" style="display:none"></p>
+      <button id="onb-next" type="button" class="w-full mt-6 py-3 rounded-xl font-display font-bold text-forest-950 bg-forest-glow hover:bg-forest-neon active:scale-[0.99] transition">Continue</button>
+    </div>
+
+    <!-- Step 2: body -->
+    <div data-onb-step="2" style="display:none">
+      <h2 class="font-display font-bold text-2xl text-white mb-1">Your body basics</h2>
+      <p class="text-forest-200/60 text-sm mb-5">Used to compute your BMI and calorie needs. Private — never shared.</p>
+
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-forest-200/55 text-xs font-medium">Units</span>
+        <span class="pf-units" id="onb-units" role="group" aria-label="Units">
+          <button type="button" class="pf-unit-btn active" data-unit="metric">cm / kg</button>
+          <button type="button" class="pf-unit-btn" data-unit="imperial">ft / lb</button>
+        </span>
+      </div>
+      <div class="flex gap-3">
+        <div class="flex-1" data-onb-ug="metric">
+          <div class="pf-input-suffix"><input id="onb-h-cm" class="pf-input" type="number" inputmode="decimal" min="50" max="250" placeholder="Height"><span class="pf-suffix">cm</span></div>
+        </div>
+        <div class="flex-1 pf-ht-imperial" data-onb-ug="imperial" style="display:none">
+          <div class="pf-input-suffix" style="flex:1"><input id="onb-h-ft" class="pf-input" type="number" inputmode="numeric" min="1" max="8" placeholder="ft"><span class="pf-suffix">ft</span></div>
+          <div class="pf-input-suffix" style="flex:1"><input id="onb-h-in" class="pf-input" type="number" inputmode="numeric" min="0" max="11" placeholder="in"><span class="pf-suffix">in</span></div>
+        </div>
+        <div class="flex-1">
+          <div class="pf-input-suffix"><input id="onb-w" class="pf-input" type="number" inputmode="decimal" min="10" max="400" placeholder="Weight"><span class="pf-suffix" id="onb-w-unit">kg</span></div>
+        </div>
+      </div>
+
+      <div id="onb-bmi-card" class="bmi-card is-empty" style="margin-top:16px">
+        <div><div class="bmi-num" id="onb-bmi-num">—</div><div class="bmi-label">Your BMI</div></div>
+        <div><div class="bmi-cat" id="onb-bmi-cat" style="color:rgba(220,240,224,0.45)">Enter height &amp; weight</div><div class="bmi-cat-sub" id="onb-bmi-sub">Auto-calculated</div></div>
+      </div>
+
+      <p id="onb-err-2" class="text-red-300 text-sm mt-3" style="display:none"></p>
+      <div class="flex gap-3 mt-6">
+        <button id="onb-back" type="button" class="px-5 py-3 rounded-xl font-semibold text-forest-100 bg-forest-800/40 border border-forest-700/30 hover:bg-forest-700/40 transition">Back</button>
+        <button id="onb-finish" type="button" class="flex-1 py-3 rounded-xl font-display font-bold text-forest-950 bg-forest-glow hover:bg-forest-neon active:scale-[0.99] transition disabled:opacity-60 disabled:cursor-wait">Finish &amp; start 🌿</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
 
 <!-- ==================== SCANNER DIALOG ==================== -->
 <dialog id="sj-scanner-dialog" class="sj-dialog" aria-labelledby="sj-scanner-title">
@@ -3022,16 +3154,68 @@ tailwind.config = {
     if (desktop) desktop.innerHTML = user ? signedInHTML(user) : signedOutHTML;
     if (mobile)  mobile.innerHTML  = user ? signedInHTML(user) : signedOutHTML;
     document.body.dataset.authed = user ? 'true' : 'false';
+    if (user) closeAuth();
     try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
   };
 
-  const signIn = async () => {
+  const $a = (id) => document.getElementById(id);
+
+  // ---- Auth dialog (Google + passwordless magic link) ----
+  const openAuth = () => {
+    const dlg = $a('auth-dialog');
+    if (!dlg) { signInGoogle(); return; }
+    resetAuthDialog();
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+  };
+  const closeAuth = () => { const d = $a('auth-dialog'); if (d && d.open) d.close(); };
+
+  const signInGoogle = async () => {
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin + window.location.pathname }
     });
-    if (error) console.error('[Sanjeevani] signIn error:', error);
+    if (error) { console.error('[Sanjeevani] Google sign-in error:', error); setAuthMsg(error.message || 'Could not start Google sign-in.', 'error'); }
   };
+
+  const sendMagicLink = async (email) => {
+    const { error } = await sb.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin + window.location.pathname }
+    });
+    return error;
+  };
+
+  function setAuthMsg(text, kind) {
+    const el = $a('auth-msg'); if (!el) return;
+    el.textContent = text || '';
+    el.className = 'mt-3 text-center text-sm ' + (kind === 'error' ? 'text-red-300' : kind === 'ok' ? 'text-forest-glow' : 'text-forest-200/60');
+    el.style.display = text ? '' : 'none';
+  }
+  function resetAuthDialog() {
+    setAuthMsg('', '');
+    const form = $a('auth-magic-form'); if (form) form.style.display = '';
+    const sent = $a('auth-sent'); if (sent) sent.style.display = 'none';
+    const email = $a('auth-email'); if (email) email.value = '';
+  }
+  function bindAuthDialog() {
+    $a('auth-close')?.addEventListener('click', closeAuth);
+    $a('auth-google')?.addEventListener('click', signInGoogle);
+    const form = $a('auth-magic-form');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = ($a('auth-email')?.value || '').trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { setAuthMsg('Please enter a valid email address.', 'error'); return; }
+      const btn = $a('auth-magic-btn'); const orig = btn ? btn.textContent : null;
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+      const error = await sendMagicLink(email);
+      if (btn) { btn.disabled = false; btn.textContent = orig; }
+      if (error) { setAuthMsg(error.message || 'Could not send the link. Please try again.', 'error'); return; }
+      form.style.display = 'none';
+      const sent = $a('auth-sent');
+      if (sent) { const em = sent.querySelector('[data-email]'); if (em) em.textContent = email; sent.style.display = ''; }
+      setAuthMsg('', '');
+    });
+  }
 
   const signOut = async () => {
     const { error } = await sb.auth.signOut();
@@ -3042,9 +3226,11 @@ tailwind.config = {
     const btn = e.target.closest('[data-auth-action]');
     if (!btn) return;
     const action = btn.getAttribute('data-auth-action');
-    if (action === 'signin') signIn();
+    if (action === 'signin') openAuth();
     else if (action === 'signout') signOut();
   });
+
+  bindAuthDialog();
 
   // Make nav/footer links open the actual feature modals instead of just scrolling.
   document.addEventListener('click', (e) => {
@@ -4563,7 +4749,7 @@ const SANJEEVANI_PROFILE = (() => {
 
   let currentUserId = null;
   let currentUserMeta = null;
-  const EMPTY_PROFILE = { goals: [], conditions: [], is_vegetarian: null, age: null, gender: null, height_cm: null, weight_kg: null };
+  const EMPTY_PROFILE = { goals: [], conditions: [], is_vegetarian: null, age: null, gender: null, height_cm: null, weight_kg: null, full_name: null };
   let cachedProfile = { ...EMPTY_PROFILE };
   let currentUnit = 'metric'; // 'metric' | 'imperial'
 
@@ -4586,6 +4772,7 @@ const SANJEEVANI_PROFILE = (() => {
       gender: typeof data?.gender === 'string' ? data.gender : null,
       height_cm: numOrNull(data?.height_cm),
       weight_kg: numOrNull(data?.weight_kg),
+      full_name: typeof data?.full_name === 'string' ? data.full_name : null,
     };
     SANJEEVANI.patchState({ profile: cachedProfile });
     try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
@@ -4603,7 +4790,7 @@ const SANJEEVANI_PROFILE = (() => {
       height_cm: values.height_cm != null ? values.height_cm : null,
       weight_kg: values.weight_kg != null ? values.weight_kg : null,
       email: currentUserMeta?.email || null,
-      full_name: currentUserMeta?.user_metadata?.full_name || currentUserMeta?.user_metadata?.name || null,
+      full_name: values.full_name || currentUserMeta?.user_metadata?.full_name || currentUserMeta?.user_metadata?.name || null,
       avatar_url: currentUserMeta?.user_metadata?.avatar_url || currentUserMeta?.user_metadata?.picture || null,
     };
     const { error } = await sb().schema(SCHEMA).from(TABLE).upsert(payload, { onConflict: 'id' });
@@ -4611,10 +4798,19 @@ const SANJEEVANI_PROFILE = (() => {
     cachedProfile = {
       goals: payload.goals, conditions: payload.conditions, is_vegetarian: payload.is_vegetarian,
       age: payload.age, gender: payload.gender, height_cm: payload.height_cm, weight_kg: payload.weight_kg,
+      full_name: payload.full_name,
     };
     SANJEEVANI.patchState({ profile: cachedProfile });
     try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
     return true;
+  }
+
+  // Merge-aware save: patches only the given fields, preserving everything else
+  // (e.g. onboarding sets body metrics without wiping goals/conditions).
+  async function update(partial) {
+    if (!currentUserId) return false;
+    const merged = { ...EMPTY_PROFILE, ...cachedProfile, ...partial };
+    return await save(merged);
   }
 
   // ---- Body metrics helpers ----
@@ -4868,14 +5064,189 @@ const SANJEEVANI_PROFILE = (() => {
   }
 
   return {
-    open, close,
+    open, close, update,
     get: () => cachedProfile,
     bmi: () => computeBmi(cachedProfile.height_cm, cachedProfile.weight_kg),
-    bmiInfo,
+    computeBmi, bmiInfo,
     _GOAL_LABELS: GOAL_LABELS, _CONDITION_LABELS: CONDITION_LABELS,
   };
 })();
 window.SANJEEVANI_PROFILE = SANJEEVANI_PROFILE;
+
+
+/* ==================== SANJEEVANI ONBOARDING (mandatory first-run) ==================== */
+const SANJEEVANI_ONBOARDING = (() => {
+  const SCHEMA = 'sanjeevani', TABLE = 'profiles';
+  const $ = (id) => document.getElementById(id);
+  const sb = () => window.SANJEEVANI_SB;
+
+  let currentUser = null;
+  let unit = 'metric';
+  let bound = false;
+  let checkedFor = null;
+
+  const num = (id) => { const v = parseFloat($(id)?.value); return isFinite(v) ? v : null; };
+
+  function bodyMetrics() {
+    let height_cm = null;
+    if (unit === 'metric') {
+      const cm = num('onb-h-cm'); height_cm = cm != null ? Math.round(cm * 10) / 10 : null;
+    } else {
+      const ft = num('onb-h-ft'), inch = num('onb-h-in');
+      if (ft != null || inch != null) { const t = (ft || 0) * 12 + (inch || 0); height_cm = t > 0 ? Math.round(t * 2.54 * 10) / 10 : null; }
+    }
+    let weight_kg = null;
+    const w = num('onb-w');
+    if (w != null) weight_kg = unit === 'metric' ? Math.round(w * 10) / 10 : Math.round(w * 0.453592 * 10) / 10;
+    return { height_cm, weight_kg };
+  }
+
+  function renderBmi() {
+    const { height_cm, weight_kg } = bodyMetrics();
+    const P = window.SANJEEVANI_PROFILE;
+    const bmi = (P && P.computeBmi) ? P.computeBmi(height_cm, weight_kg)
+      : (height_cm && weight_kg ? weight_kg / Math.pow(height_cm / 100, 2) : null);
+    const card = $('onb-bmi-card'), n = $('onb-bmi-num'), c = $('onb-bmi-cat'), s = $('onb-bmi-sub');
+    if (!card) return;
+    if (bmi) {
+      const info = (P && P.bmiInfo) ? P.bmiInfo(bmi) : { cat: '', color: '#00E676', sub: '' };
+      n.textContent = (Math.round(bmi * 10) / 10).toFixed(1); n.style.color = '#fff';
+      c.textContent = info.cat; c.style.color = info.color; s.textContent = info.sub;
+      card.classList.remove('is-empty'); card.style.borderColor = info.color + '55';
+    } else {
+      n.textContent = '—'; n.style.color = '';
+      c.textContent = 'Enter height & weight'; c.style.color = 'rgba(220,240,224,0.45)';
+      s.textContent = 'Auto-calculated';
+      card.classList.add('is-empty'); card.style.borderColor = '';
+    }
+  }
+
+  function applyUnit(height_cm, weight_kg) {
+    document.querySelectorAll('[data-onb-ug]').forEach(el => { el.style.display = el.dataset.onbUg === unit ? '' : 'none'; });
+    const wu = $('onb-w-unit'); if (wu) wu.textContent = unit === 'metric' ? 'kg' : 'lb';
+    document.querySelectorAll('#onb-units .pf-unit-btn').forEach(b => b.classList.toggle('active', b.dataset.unit === unit));
+    if (unit === 'metric') {
+      if ($('onb-h-cm')) $('onb-h-cm').value = height_cm != null ? Math.round(height_cm * 10) / 10 : '';
+      if ($('onb-w')) $('onb-w').value = weight_kg != null ? Math.round(weight_kg * 10) / 10 : '';
+    } else {
+      if (height_cm != null) {
+        const t = height_cm / 2.54; let ft = Math.floor(t / 12), inch = Math.round(t - ft * 12);
+        if (inch === 12) { ft++; inch = 0; }
+        if ($('onb-h-ft')) $('onb-h-ft').value = ft;
+        if ($('onb-h-in')) $('onb-h-in').value = inch;
+      } else { if ($('onb-h-ft')) $('onb-h-ft').value = ''; if ($('onb-h-in')) $('onb-h-in').value = ''; }
+      if ($('onb-w')) $('onb-w').value = weight_kg != null ? Math.round(weight_kg / 0.453592) : '';
+    }
+  }
+
+  function setUnit(u) { if (u === unit) return; const { height_cm, weight_kg } = bodyMetrics(); unit = u; applyUnit(height_cm, weight_kg); renderBmi(); }
+
+  function gotoStep(n) {
+    document.querySelectorAll('[data-onb-step]').forEach(el => { el.style.display = el.dataset.onbStep === String(n) ? '' : 'none'; });
+    document.querySelectorAll('.sj-onb-dot').forEach(d => d.classList.toggle('active', Number(d.dataset.dot) <= n));
+  }
+
+  function showErr(el, msg) { if (!el) return; el.textContent = msg || ''; el.style.display = msg ? '' : 'none'; }
+
+  function show(prefillName) {
+    const dlg = $('onboarding-dialog'); if (!dlg) return;
+    if ($('onb-name') && !$('onb-name').value) $('onb-name').value = prefillName || '';
+    gotoStep(1);
+    if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute('open', '');
+  }
+  function hide() { const d = $('onboarding-dialog'); if (d && d.open) d.close(); }
+
+  function bind() {
+    if (bound) return; bound = true;
+    $('onboarding-dialog')?.addEventListener('cancel', (e) => e.preventDefault()); // block ESC — mandatory
+    document.querySelectorAll('#onb-gender .profile-chip').forEach(c => c.addEventListener('click', () => {
+      const was = c.classList.contains('active');
+      document.querySelectorAll('#onb-gender .profile-chip').forEach(x => x.classList.remove('active'));
+      if (!was) c.classList.add('active');
+    }));
+    document.querySelectorAll('#onb-units .pf-unit-btn').forEach(b => b.addEventListener('click', () => setUnit(b.dataset.unit)));
+    ['onb-h-cm', 'onb-h-ft', 'onb-h-in', 'onb-w'].forEach(id => $(id)?.addEventListener('input', renderBmi));
+    $('onb-next')?.addEventListener('click', () => {
+      const name = ($('onb-name')?.value || '').trim();
+      const age = parseInt($('onb-age')?.value, 10);
+      const gender = document.querySelector('#onb-gender .profile-chip.active')?.dataset.value;
+      const err = $('onb-err-1');
+      if (!name) return showErr(err, 'Please enter your name.');
+      if (!(age >= 1 && age <= 120)) return showErr(err, 'Please enter a valid age (1–120).');
+      if (!gender) return showErr(err, 'Please pick a gender — it helps tailor your advice.');
+      showErr(err, ''); gotoStep(2); renderBmi();
+    });
+    $('onb-back')?.addEventListener('click', () => gotoStep(1));
+    $('onb-finish')?.addEventListener('click', finish);
+  }
+
+  async function finish() {
+    const { height_cm, weight_kg } = bodyMetrics();
+    const err = $('onb-err-2');
+    if (!height_cm || height_cm < 50 || height_cm > 250) return showErr(err, 'Please enter a valid height.');
+    if (!weight_kg || weight_kg < 10 || weight_kg > 400) return showErr(err, 'Please enter a valid weight.');
+    showErr(err, '');
+    const name = ($('onb-name')?.value || '').trim();
+    const age = parseInt($('onb-age')?.value, 10);
+    const gender = document.querySelector('#onb-gender .profile-chip.active')?.dataset.value || null;
+    const btn = $('onb-finish'); const orig = btn ? btn.textContent : null;
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    let ok = false;
+    try { ok = await window.SANJEEVANI_PROFILE?.update({ full_name: name, age, gender, height_cm, weight_kg }); }
+    catch (e) { console.error('[Onboarding] save error:', e); }
+    if (btn) { btn.disabled = false; btn.textContent = orig; }
+    if (ok) {
+      hide();
+      window.SANJEEVANI?.toast?.(`You're all set, ${name.split(' ')[0]}! 🌿`);
+    } else {
+      showErr(err, 'Could not save your details right now. You can skip and add them later from your profile.');
+      // Safety valve so a backend hiccup can never trap the user
+      let esc = $('onb-escape');
+      if (!esc) {
+        esc = document.createElement('button');
+        esc.id = 'onb-escape'; esc.type = 'button';
+        esc.className = 'w-full mt-3 text-forest-300/60 hover:text-forest-200 text-sm underline';
+        esc.textContent = 'Skip for now';
+        esc.addEventListener('click', hide);
+        btn?.parentElement?.parentElement?.appendChild(esc);
+      }
+      esc.style.display = '';
+    }
+  }
+
+  async function maybeShowFor(user) {
+    if (!user || !sb()) return;
+    if (checkedFor === user.id) return;
+    checkedFor = user.id;
+    bind();
+    try {
+      const { data, error } = await sb().schema(SCHEMA).from(TABLE)
+        .select('age, height_cm, weight_kg, gender, full_name')
+        .eq('id', user.id).maybeSingle();
+      if (error) { console.error('[Onboarding] check error:', error); return; }
+      const complete = data && data.age != null && data.height_cm != null && data.weight_kg != null;
+      if (!complete) {
+        const prefill = (data && data.full_name) || user.user_metadata?.full_name || user.user_metadata?.name || '';
+        show(prefill);
+      }
+    } catch (e) { console.error('[Onboarding] check exception:', e); }
+  }
+
+  function init() {
+    if (!sb()) return;
+    sb().auth.getSession().then(({ data }) => { const u = data.session?.user; if (u) { currentUser = u; maybeShowFor(u); } });
+    sb().auth.onAuthStateChange((_e, session) => {
+      const u = session?.user;
+      if (u && (!currentUser || u.id !== currentUser.id)) { currentUser = u; maybeShowFor(u); }
+      else if (!u) { currentUser = null; checkedFor = null; hide(); }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  return { _show: show };
+})();
+window.SANJEEVANI_ONBOARDING = SANJEEVANI_ONBOARDING;
 
 
 /* ==================== SANJEEVANI DASHBOARD (real user data) ==================== */
