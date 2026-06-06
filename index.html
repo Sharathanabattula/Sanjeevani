@@ -1770,12 +1770,12 @@ tailwind.config = {
       </a>
 
       <!-- SMALL TYPOGRAPHIC: Lab reports — 4 cols -->
-      <div class="lg:col-span-4 rounded-3xl border border-forest-700/20 bg-forest-900/15 p-7">
-        <p class="text-forest-400/60 text-[11px] font-mono tracking-[0.2em] uppercase mb-3">04</p>
+      <button type="button" data-labs-open="true" class="group lg:col-span-4 rounded-3xl border border-forest-700/20 bg-forest-900/15 p-7 text-left w-full cursor-pointer hover:border-forest-glow/30 transition-colors">
+        <p class="text-forest-400/60 text-[11px] font-mono tracking-[0.2em] uppercase mb-3">04 · Health intelligence</p>
         <h3 class="font-display font-medium text-xl text-parchment-50 leading-snug mb-2 tracking-tight">Lab reports, plain-spoken.</h3>
-        <p class="text-forest-200/55 text-[13.5px] leading-relaxed">Upload a blood test PDF. Get back what the numbers <em class="not-italic text-forest-glow/80">mean</em> — not what they say.</p>
-        <p class="text-haldi-300/70 text-[10px] font-mono tracking-wider uppercase mt-4">Coming soon</p>
-      </div>
+        <p class="text-forest-200/55 text-[13.5px] leading-relaxed">Upload a blood test (photo or PDF). Get back what the numbers <em class="not-italic text-forest-glow/80">mean</em> — and what to eat.</p>
+        <span class="text-forest-glow text-xs font-medium mt-4 inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">→ Upload a report</span>
+      </button>
 
       <!-- SMALL TYPOGRAPHIC: Family — 4 cols -->
       <div class="lg:col-span-4 rounded-3xl border border-forest-700/20 bg-forest-900/15 p-7">
@@ -2011,6 +2011,13 @@ tailwind.config = {
           Share today's report
         </button>
         <p class="text-center text-forest-300/40 text-xs mt-2">A shareable image for WhatsApp, Instagram &amp; Snap</p>
+
+        <!-- Health intelligence -->
+        <button id="dash-labs" type="button" data-labs-open="true"
+          class="relative mt-3 w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-display font-bold text-base text-forest-100 bg-forest-800/40 border border-forest-700/30 hover:border-forest-glow/40 hover:bg-forest-800/60 active:scale-[0.99] transition">
+          🧪 Scan a lab report
+        </button>
+        <p class="text-center text-forest-300/40 text-xs mt-2">AI reads your bloodwork &amp; tells you what to eat</p>
       </div>
     </div>
   </div>
@@ -2916,6 +2923,19 @@ tailwind.config = {
   }
   .sj-onb-dot { width: 8px; height: 8px; border-radius: 999px; background: rgba(76,175,80,0.28); transition: all .28s cubic-bezier(0.22,1,0.36,1); }
   .sj-onb-dot.active { background: #00E676; width: 26px; }
+  /* ---- Health reports (labs) ---- */
+  .sj-modal-lg { max-width: 660px; }
+  .labs-drop { border: 1.5px dashed rgba(0,230,118,0.30); border-radius: 18px; padding: 30px 20px; text-align: center; cursor: pointer; transition: background .15s ease, border-color .15s ease; background: rgba(0,230,118,0.04); }
+  .labs-drop:hover { background: rgba(0,230,118,0.09); border-color: rgba(0,230,118,0.55); }
+  .labs-marker { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(76,175,80,0.10); }
+  .labs-marker:last-child { border-bottom: none; }
+  .labs-dot { width: 10px; height: 10px; border-radius: 999px; margin-top: 6px; flex: 0 0 auto; }
+  .labs-chip { display: inline-block; padding: 6px 12px; border-radius: 999px; font-size: 13px; margin: 0 6px 6px 0; }
+  .labs-chip-good { background: rgba(0,230,118,0.12); color: #9bf5c4; border: 1px solid rgba(0,230,118,0.25); }
+  .labs-chip-bad { background: rgba(255,112,67,0.12); color: #ffb59e; border: 1px solid rgba(255,112,67,0.28); }
+  .labs-flag { border-radius: 12px; padding: 12px 14px; font-size: 13.5px; line-height: 1.5; }
+  .labs-hist-item { width: 100%; text-align: left; padding: 12px 14px; border-radius: 12px; background: rgba(76,175,80,0.06); border: 1px solid rgba(76,175,80,0.12); cursor: pointer; transition: background .15s ease; }
+  .labs-hist-item:hover { background: rgba(76,175,80,0.12); }
 </style>
 
 <!-- ==================== AUTH DIALOG (Google + magic link) ==================== -->
@@ -3034,6 +3054,91 @@ tailwind.config = {
   </div>
 </dialog>
 
+
+<!-- ==================== HEALTH REPORTS (LABS) DIALOG ==================== -->
+<input id="labs-file-input" type="file" accept="image/*,application/pdf" style="display:none">
+<dialog id="labs-dialog" class="sj-modal sj-modal-lg" aria-labelledby="labs-title">
+  <div class="sj-modal-shell" style="max-height:88vh; display:flex; flex-direction:column; overflow:hidden;">
+    <div class="flex items-start justify-between mb-1 shrink-0">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🧪</span>
+        <div>
+          <h2 id="labs-title" class="font-display font-bold text-xl text-white leading-tight">Health Intelligence</h2>
+          <p class="text-forest-200/55 text-xs mt-0.5">Upload a lab report — get it in plain language</p>
+        </div>
+      </div>
+      <button id="labs-close" type="button" aria-label="Close" class="w-9 h-9 rounded-full bg-forest-800/50 hover:bg-forest-700/60 flex items-center justify-center text-forest-200/70 hover:text-white transition-colors shrink-0">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="overflow-y-auto mt-4 pr-1" style="flex:1 1 auto; min-height:0;">
+
+      <!-- Upload view -->
+      <div id="labs-upload-view">
+        <div id="labs-drop" class="labs-drop">
+          <div class="text-3xl mb-2">📄</div>
+          <p class="text-white font-semibold text-sm">Tap to upload a lab report</p>
+          <p class="text-forest-200/50 text-xs mt-1">Blood test, lipid profile, HbA1c, thyroid… — photo or PDF</p>
+        </div>
+        <p id="labs-err" class="text-red-300 text-sm mt-3" style="display:none"></p>
+        <p class="text-forest-300/35 text-[11px] mt-3 leading-relaxed">
+          🔒 Private to your account. This is general wellness guidance, <strong>not a medical diagnosis</strong> — always confirm with your doctor.
+        </p>
+
+        <div id="labs-history-wrap" class="mt-6" style="display:none">
+          <p class="text-forest-300/60 text-xs uppercase tracking-wider font-semibold mb-3">Your reports</p>
+          <div id="labs-history" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="labs-loading" class="text-center py-12" style="display:none">
+        <span class="sj-spinner" style="display:inline-block; width:32px; height:32px;"></span>
+        <p class="text-forest-100 font-medium mt-4">Reading your report…</p>
+        <p class="text-forest-300/50 text-xs mt-1">Extracting values and tailoring advice to you</p>
+      </div>
+
+      <!-- Result -->
+      <div id="labs-result" style="display:none">
+        <button id="labs-back" type="button" class="text-forest-300/60 hover:text-forest-glow text-sm mb-3 inline-flex items-center gap-1">← All reports</button>
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <h3 id="labs-r-title" class="font-display font-bold text-xl text-white">—</h3>
+          <span id="labs-r-date" class="text-forest-300/50 text-xs"></span>
+        </div>
+        <div id="labs-r-flag" class="labs-flag mt-3" style="display:none"></div>
+        <p id="labs-r-summary" class="text-forest-100/85 text-sm leading-relaxed mt-3"></p>
+
+        <div id="labs-r-markers-wrap" class="mt-5" style="display:none">
+          <p class="text-forest-300/60 text-xs uppercase tracking-wider font-semibold mb-1">Your results</p>
+          <div id="labs-r-markers"></div>
+        </div>
+
+        <div id="labs-r-favor-wrap" class="mt-5" style="display:none">
+          <p class="text-forest-glow text-xs font-bold uppercase tracking-wider mb-2">✅ Eat more</p>
+          <div id="labs-r-favor"></div>
+        </div>
+        <div id="labs-r-limit-wrap" class="mt-4" style="display:none">
+          <p class="text-orange-300 text-xs font-bold uppercase tracking-wider mb-2">⚠️ Go easy on</p>
+          <div id="labs-r-limit"></div>
+        </div>
+        <div id="labs-r-life-wrap" class="mt-4" style="display:none">
+          <p class="text-forest-300/60 text-xs uppercase tracking-wider font-semibold mb-2">Lifestyle</p>
+          <ul id="labs-r-life" class="list-disc list-inside text-forest-100/80 text-sm space-y-1"></ul>
+        </div>
+
+        <p class="text-forest-300/35 text-[11px] mt-5 leading-relaxed">
+          ⚕️ This is AI-generated wellness guidance, not a diagnosis. Always confirm with a qualified doctor before acting on it.
+        </p>
+        <div class="flex gap-2 mt-5">
+          <button id="labs-another" type="button" class="sj-btn sj-btn-ghost flex-1">↻ Upload another</button>
+          <button id="labs-ask-coach" type="button" class="sj-btn sj-btn-primary flex-1">Ask the Coach about this</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</dialog>
 
 <!-- ==================== SCANNER DIALOG ==================== -->
 <dialog id="sj-scanner-dialog" class="sj-dialog" aria-labelledby="sj-scanner-title">
@@ -3563,10 +3668,11 @@ If not food: {"error":"not_food"}.`;
     // Production path: proxy through /api/gemini-vision (server holds the key).
     if (USE_PROXY) {
       const profile = (loadState && loadState().profile) || (window.SANJEEVANI_PROFILE?.get?.() || null);
+      const labs = (loadState && loadState().labs) || null;
       const res = await fetchWithTimeout('/api/gemini-vision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_base64: base64, mime_type: 'image/jpeg', profile }),
+        body: JSON.stringify({ image_base64: base64, mime_type: 'image/jpeg', profile, labs }),
       }, 45000);
       if (!res.ok) {
         // Body may be JSON (from the proxy) or HTML/text (e.g. a 404 from a static dev server).
@@ -4150,6 +4256,18 @@ const SANJEEVANI_COACH = (() => {
 
 `;
 
+    const labs = s.labs;
+    const labsBlock = (labs && (labs.summary || (Array.isArray(labs.abnormal) && labs.abnormal.length)))
+      ? `RECENT LAB REPORT (${labs.date || 'recent'} — ${labs.title || 'report'}):
+- Summary: ${labs.summary || '—'}
+- Flagged markers: ${(Array.isArray(labs.abnormal) && labs.abnormal.length) ? labs.abnormal.join('; ') : 'none flagged'}
+- Suggested to favor: ${(labs.foods_to_favor || []).join(', ') || '—'}
+- Suggested to limit: ${(labs.foods_to_limit || []).join(', ') || '—'}
+Use these results to inform nutrition advice (e.g. high LDL → soluble fibre, less fried; low haemoglobin → iron + vitamin C). Do NOT diagnose — defer clinical decisions to a doctor.
+
+`
+      : '';
+
     return `You are Sanjeevani, an AI health coach for users in India and the Indian diaspora.
 
 Personality: Warm, precise, never preachy. Speak like a smart friend who happens to be a registered dietitian. Code-switch into Hindi / Tamil / Telugu / Bengali words ONLY when it genuinely helps (food names, cultural context) — never to seem trendy.
@@ -4164,7 +4282,7 @@ Rules:
 - Never recommend extreme diets, fasting longer than 18h, or extreme cardio.
 - If the user logs something concerning (very low calories, signs of an eating disorder, suicidal ideation), respond with care and recommend professional help (e.g. iCall India 9152987821).
 
-${profileBlock}USER CONTEXT (from app data, today is ${today}):
+${profileBlock}${labsBlock}USER CONTEXT (from app data, today is ${today}):
 - Recent meals (most recent first):
 ${mealLines}
 - Today so far: ${todaysMeals.length} meals, ~${todaysKcal} kcal, ${todaysProtein}g protein
@@ -5452,6 +5570,205 @@ const SANJEEVANI_DAILY = (() => {
   return { render, _pull: pull };
 })();
 window.SANJEEVANI_DAILY = SANJEEVANI_DAILY;
+
+
+/* ==================== SANJEEVANI HEALTH INTELLIGENCE (lab reports) ==================== */
+const SANJEEVANI_LABS = (() => {
+  const SCHEMA = 'sanjeevani', TABLE = 'health_reports';
+  const $ = (id) => document.getElementById(id);
+  const sb = () => window.SANJEEVANI_SB;
+  let userId = null, bound = false, cache = [];
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const statusColor = (st) => st === 'high' ? '#FF7043' : st === 'low' ? '#F4B400' : st === 'borderline' ? '#F4B400' : st === 'normal' ? '#00E676' : 'rgba(220,240,224,0.4)';
+  const statusLabel = (st) => st === 'high' ? 'High' : st === 'low' ? 'Low' : st === 'borderline' ? 'Borderline' : st === 'normal' ? 'Normal' : '';
+
+  function open() {
+    const dlg = $('labs-dialog'); if (!dlg) return;
+    showUpload(); renderHistory();
+    if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute('open', '');
+  }
+  function close() { const d = $('labs-dialog'); if (d && d.open) d.close(); }
+  function showUpload() { $('labs-upload-view').style.display = ''; $('labs-loading').style.display = 'none'; $('labs-result').style.display = 'none'; err(''); }
+  function showLoading() { $('labs-upload-view').style.display = 'none'; $('labs-loading').style.display = ''; $('labs-result').style.display = 'none'; }
+  function showResult() { $('labs-upload-view').style.display = 'none'; $('labs-loading').style.display = 'none'; $('labs-result').style.display = ''; }
+  function err(msg) { const e = $('labs-err'); if (!e) return; e.textContent = msg || ''; e.style.display = msg ? '' : 'none'; }
+
+  async function fileToPayload(file) {
+    if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
+      if (file.size > 12 * 1024 * 1024) throw new Error('That PDF is large (over 12 MB). Try a smaller file, or a photo of the key page.');
+      const b64 = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(String(r.result)); r.onerror = () => rej(new Error('Could not read that PDF.'));
+        r.readAsDataURL(file);
+      });
+      return { data: b64, mime: 'application/pdf' };
+    }
+    if (file.size > 25 * 1024 * 1024) throw new Error('That image is very large (over 25 MB). Try a smaller photo.');
+    const objectUrl = URL.createObjectURL(file);
+    const img = await new Promise((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => { URL.revokeObjectURL(objectUrl); rej(new Error('Couldn’t read this image — try a JPG/PNG or a PDF.')); };
+      i.src = objectUrl;
+    });
+    const canvas = document.createElement('canvas');
+    const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+    canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(objectUrl);
+    return { data: canvas.toDataURL('image/jpeg', 0.9), mime: 'image/jpeg' };
+  }
+
+  function mapErr(status, e) {
+    const c = e && e.error;
+    if (c === 'not_report') return 'That doesn’t look like a medical/lab report. Try a clearer photo, or the original PDF.';
+    if (c === 'file_too_large' || status === 413) return 'That file is too large. Try a smaller photo or PDF.';
+    if (c === 'server_misconfigured') return 'The AI isn’t set up on the server yet. Please contact the site owner.';
+    if (status === 404) return 'AI service unavailable. If you’re running this locally, use the deployed site.';
+    if (status === 429) return 'The AI is busy right now — wait a few seconds and try again.';
+    return 'The AI had trouble reading this. Try a clearer photo or the original PDF.';
+  }
+
+  async function analyze(file) {
+    showLoading();
+    try {
+      const { data, mime } = await fileToPayload(file);
+      const profile = (window.SANJEEVANI_PROFILE?.get?.()) || null;
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 60000);
+      let res;
+      try {
+        res = await fetch('/api/analyze-report', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ file_base64: data, mime_type: mime, profile }), signal: ctrl.signal,
+        });
+      } finally { clearTimeout(t); }
+      if (!res.ok) { const e = await res.json().catch(() => null); throw new Error(mapErr(res.status, e)); }
+      const result = await res.json();
+      renderResult(result); showResult(); saveReport(result);
+    } catch (e) {
+      showUpload();
+      err(e.name === 'AbortError' ? 'That took too long — try again, or use a clearer photo.' : (e.message || 'Could not analyze the report.'));
+    }
+  }
+
+  const chips = (arr, cls) => (arr || []).map(x => `<span class="labs-chip ${cls}">${esc(x)}</span>`).join('');
+  function toggleChips(baseId, arr, cls) {
+    const wrap = $(baseId + '-wrap'), el = $(baseId);
+    if (arr && arr.length) { el.innerHTML = chips(arr, cls); wrap.style.display = ''; } else wrap.style.display = 'none';
+  }
+
+  function renderResult(r) {
+    $('labs-r-title').textContent = r.title || 'Lab report';
+    $('labs-r-date').textContent = r.report_date ? `🗓 ${r.report_date}` : '';
+    const flag = $('labs-r-flag');
+    const fmap = {
+      urgent: ['#FF7043', 'rgba(255,112,67,0.12)', 'See a doctor promptly'],
+      soon: ['#F4B400', 'rgba(244,180,0,0.12)', 'Worth a doctor visit soon'],
+      routine: ['#69F0AE', 'rgba(0,230,118,0.10)', 'Discuss at your next routine check-up'],
+      none: ['#69F0AE', 'rgba(0,230,118,0.10)', 'Looks routine'],
+    };
+    const f = fmap[r.doctor_flag] || fmap.routine;
+    if (r.doctor_note || r.doctor_flag) { flag.style.display = ''; flag.style.background = f[1]; flag.style.color = f[0]; flag.innerHTML = `<strong>${f[2]}.</strong> ${esc(r.doctor_note || '')}`; }
+    else flag.style.display = 'none';
+    $('labs-r-summary').textContent = r.summary || '';
+
+    const mw = $('labs-r-markers-wrap'), ml = $('labs-r-markers');
+    if (r.markers && r.markers.length) {
+      ml.innerHTML = r.markers.map(m => `
+        <div class="labs-marker">
+          <span class="labs-dot" style="background:${statusColor(m.status)}"></span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-white text-sm font-medium">${esc(m.name)}</span>
+              <span class="text-sm font-semibold" style="color:${statusColor(m.status)}">${esc(m.value)}${m.unit ? ' ' + esc(m.unit) : ''}</span>
+            </div>
+            <div class="flex items-center justify-between gap-2 mt-0.5">
+              <span class="text-forest-300/50 text-xs">${esc(m.meaning || '')}</span>
+              <span class="text-forest-300/40 text-[11px] whitespace-nowrap">${m.ref_range ? 'ref ' + esc(m.ref_range) : ''}${statusLabel(m.status) ? ' · ' + statusLabel(m.status) : ''}</span>
+            </div>
+          </div>
+        </div>`).join('');
+      mw.style.display = '';
+    } else mw.style.display = 'none';
+
+    toggleChips('labs-r-favor', r.foods_to_favor, 'labs-chip-good');
+    toggleChips('labs-r-limit', r.foods_to_limit, 'labs-chip-bad');
+    const lw = $('labs-r-life-wrap'), ll = $('labs-r-life');
+    if (r.lifestyle && r.lifestyle.length) { ll.innerHTML = r.lifestyle.map(x => `<li>${esc(x)}</li>`).join(''); lw.style.display = ''; } else lw.style.display = 'none';
+  }
+
+  function labsForAI(r) {
+    const abnormal = (r.markers || []).filter(m => ['high', 'low', 'borderline'].includes(m.status))
+      .map(m => `${m.name} ${m.value}${m.unit || ''} (${m.status})`);
+    return { date: r.report_date || new Date().toLocaleDateString(), title: r.title, summary: r.summary, abnormal: abnormal.slice(0, 10), foods_to_favor: r.foods_to_favor || [], foods_to_limit: r.foods_to_limit || [] };
+  }
+
+  async function saveReport(r) {
+    try { SANJEEVANI.patchState({ labs: labsForAI(r) }); } catch (_) {}
+    if (!userId || !sb()) return;
+    const payload = {
+      user_id: userId, title: r.title, report_date: r.report_date || null, summary: r.summary,
+      markers: r.markers, doctor_flag: r.doctor_flag,
+      recommendations: { concerns: r.concerns, foods_to_favor: r.foods_to_favor, foods_to_limit: r.foods_to_limit, lifestyle: r.lifestyle, doctor_note: r.doctor_note },
+    };
+    const { error } = await sb().schema(SCHEMA).from(TABLE).insert(payload);
+    if (error) console.error('[Labs] save error:', error);
+  }
+
+  async function renderHistory() {
+    const wrap = $('labs-history-wrap'), list = $('labs-history');
+    if (!userId || !sb()) { if (wrap) wrap.style.display = 'none'; return; }
+    const { data, error } = await sb().schema(SCHEMA).from(TABLE)
+      .select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(10);
+    if (error) { console.error('[Labs] history error:', error); return; }
+    cache = data || [];
+    if (!cache.length) { wrap.style.display = 'none'; return; }
+    list.innerHTML = cache.map((r, i) => {
+      const when = new Date(r.created_at).toLocaleDateString();
+      const ab = (Array.isArray(r.markers) ? r.markers : []).filter(m => ['high', 'low', 'borderline'].includes(m.status)).length;
+      return `<button type="button" class="labs-hist-item" data-idx="${i}">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-white text-sm font-medium">${esc(r.title || 'Lab report')}</span>
+          <span class="text-forest-300/40 text-xs">${when}</span>
+        </div>
+        <div class="text-forest-300/50 text-xs mt-0.5">${ab ? ab + ' to watch' : 'all normal'}${r.report_date ? ' · ' + esc(r.report_date) : ''}</div>
+      </button>`;
+    }).join('');
+    list.querySelectorAll('[data-idx]').forEach(b => b.addEventListener('click', () => {
+      const row = cache[Number(b.dataset.idx)]; if (!row) return;
+      const rec = row.recommendations || {};
+      renderResult({ title: row.title, report_date: row.report_date, summary: row.summary, markers: Array.isArray(row.markers) ? row.markers : [], foods_to_favor: rec.foods_to_favor, foods_to_limit: rec.foods_to_limit, lifestyle: rec.lifestyle, concerns: rec.concerns, doctor_flag: row.doctor_flag, doctor_note: rec.doctor_note });
+      showResult();
+    }));
+    wrap.style.display = '';
+  }
+
+  function bind() {
+    if (bound) return; bound = true;
+    $('labs-close')?.addEventListener('click', close);
+    $('labs-dialog')?.addEventListener('cancel', () => {}); // allow ESC to close (not mandatory)
+    $('labs-drop')?.addEventListener('click', () => $('labs-file-input')?.click());
+    $('labs-file-input')?.addEventListener('change', (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) analyze(f); });
+    $('labs-back')?.addEventListener('click', () => { showUpload(); renderHistory(); });
+    $('labs-another')?.addEventListener('click', () => $('labs-file-input')?.click());
+    $('labs-ask-coach')?.addEventListener('click', () => { close(); try { window.SANJEEVANI_COACH?.open?.(); } catch (_) {} });
+    document.addEventListener('click', (e) => { const t = e.target.closest('[data-labs-open]'); if (t) { e.preventDefault(); open(); } });
+  }
+
+  function init() {
+    bind();
+    if (!sb()) return;
+    sb().auth.getSession().then(({ data }) => { userId = data.session?.user?.id || null; });
+    sb().auth.onAuthStateChange((_e, session) => { userId = session?.user?.id || null; });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  return { open, close };
+})();
+window.SANJEEVANI_LABS = SANJEEVANI_LABS;
 
 
 /* ==================== SANJEEVANI DASHBOARD (real user data) ==================== */

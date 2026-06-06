@@ -111,7 +111,7 @@ export default async function handler(req, res) {
   }
   const model = process.env.GEMINI_MODEL || 'gemini-flash-latest';
 
-  const { image_base64, mime_type, profile } = req.body || {};
+  const { image_base64, mime_type, profile, labs } = req.body || {};
   if (!image_base64 || typeof image_base64 !== 'string') {
     return res.status(400).json({ error: 'image_base64_required' });
   }
@@ -143,9 +143,16 @@ export default async function handler(req, res) {
     if (veg) out.push(`Diet: ${veg}`);
     return out.length ? out.join(' · ') : null;
   })();
-  const PROFILE_CONTEXT = profileLines
+  // Optional recent lab findings (client-validated shape) to make swaps bloodwork-aware.
+  const labsLine = (() => {
+    if (!labs || typeof labs !== 'object') return '';
+    const abn = Array.isArray(labs.abnormal) ? labs.abnormal.slice(0, 8).map(String).join('; ').slice(0, 240) : '';
+    if (!abn) return '';
+    return ` Recent lab report flagged: ${abn}. Bias the Smart Swap to help these (e.g. high LDL/triglycerides → less fried/ghee, more soluble fibre; high glucose/HbA1c → lower-GI, smaller refined-carb portions; low haemoglobin → iron + vitamin C).`;
+  })();
+  const PROFILE_CONTEXT = (profileLines
     ? `The user has shared: ${profileLines}. Make the Smart Swap match these — e.g., low-GI for diabetes, iron+folate-rich for pregnancy, no meat/fish for vegetarian, lower sodium for high BP. If BMI is overweight/obese, gently favor lower-calorie, higher-satiety, higher-protein swaps; if underweight, do NOT push calorie cuts — favor nutrient-dense additions. If the meal directly contradicts a condition (e.g. deep-fried for a diabetic), call it out gently in verdict_reason.`
-    : 'No user profile shared — give a generally healthier swap suited to typical Indian palates.';
+    : 'No user profile shared — give a generally healthier swap suited to typical Indian palates.') + labsLine;
 
   const finalPrompt = ANALYZE_PROMPT.replace('{PROFILE_CONTEXT}', PROFILE_CONTEXT);
   // Strip data URL prefix if present

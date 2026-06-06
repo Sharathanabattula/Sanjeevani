@@ -233,6 +233,37 @@ create policy "Daily: update own" on sanjeevani.daily_logs
   for update using (auth.uid() = user_id);
 
 -- ============================================================
+-- HEALTH_REPORTS (lab / medical report interpretations)
+-- ============================================================
+create table if not exists sanjeevani.health_reports (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users on delete cascade not null,
+  title text not null default 'Lab report',
+  report_date text,
+  summary text,
+  markers jsonb default '[]'::jsonb,
+  recommendations jsonb default '{}'::jsonb,
+  doctor_flag text,
+  created_at timestamptz default now()
+);
+
+create index if not exists health_reports_user_created_idx on sanjeevani.health_reports(user_id, created_at desc);
+
+alter table sanjeevani.health_reports enable row level security;
+
+drop policy if exists "Reports: read own" on sanjeevani.health_reports;
+create policy "Reports: read own" on sanjeevani.health_reports
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "Reports: insert own" on sanjeevani.health_reports;
+create policy "Reports: insert own" on sanjeevani.health_reports
+  for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Reports: delete own" on sanjeevani.health_reports;
+create policy "Reports: delete own" on sanjeevani.health_reports
+  for delete using (auth.uid() = user_id);
+
+-- ============================================================
 -- Expose schema to PostgREST (Supabase's REST API layer)
 -- ============================================================
 -- In Supabase Dashboard → Settings → API → "Exposed schemas",
