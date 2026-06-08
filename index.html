@@ -3248,10 +3248,20 @@ tailwind.config = {
         </p>
       </div>
 
+      <!-- Saved-to-today confirmation -->
+      <div class="mb-3 flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 bg-forest-glow/10 border border-forest-glow/25">
+        <span class="text-forest-glow text-base leading-none">✓</span>
+        <p class="text-forest-100 text-sm leading-tight">
+          <span class="font-semibold text-white">Added to today.</span>
+          <span id="sj-result-tally" class="text-forest-300/80"></span>
+        </p>
+      </div>
+
       <div class="flex gap-2">
         <button id="sj-result-scan-another" type="button" class="sj-btn sj-btn-ghost flex-1">↻ Scan another</button>
-        <button id="sj-result-done" type="button" class="sj-btn sj-btn-primary flex-1">View full details</button>
+        <button id="sj-result-share" type="button" class="sj-btn sj-btn-primary flex-1">📤 Share today's report</button>
       </div>
+      <button id="sj-result-done" type="button" class="w-full mt-2 text-center text-forest-300/60 hover:text-forest-glow text-xs font-medium transition-colors py-1.5">View full details →</button>
     </div>
   </div>
 
@@ -3455,7 +3465,25 @@ const SANJEEVANI = (() => {
     }
   }
   function saveState(s) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch (_) {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    } catch (e) {
+      // Storage is full (usually too many meal photos). Shed image payloads
+      // oldest-first and retry so the meal itself is never silently lost.
+      try {
+        if (Array.isArray(s.meals)) {
+          const trimmed = { ...s, meals: s.meals.map((m, i) => i < 6 ? m : { ...m, imageDataUrl: undefined }) };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+          return;
+        }
+        throw e;
+      } catch (_) {
+        try {
+          const minimal = { ...s, meals: (s.meals || []).slice(0, 15).map((m, i) => i < 2 ? m : { ...m, imageDataUrl: undefined }) };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(minimal));
+        } catch (_) { /* give up gracefully */ }
+      }
+    }
   }
   function patchState(patch) {
     const s = loadState();
@@ -3572,6 +3600,26 @@ const SANJEEVANI = (() => {
     URL.revokeObjectURL(objectUrl);
     return canvas.toDataURL('image/jpeg', JPEG_QUALITY);
   }
+  // Build a tiny thumbnail so a saved meal/report stays small in storage.
+  // Full-size scans are only needed transiently for the AI call + result view.
+  async function makeThumb(dataUrl, dim = 320) {
+    try {
+      const img = await new Promise((res, rej) => {
+        const i = new Image();
+        i.onload = () => res(i);
+        i.onerror = rej;
+        i.src = dataUrl;
+      });
+      const scale = Math.min(1, dim / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.width * scale));
+      c.height = Math.max(1, Math.round(img.height * scale));
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      return c.toDataURL('image/jpeg', 0.8);
+    } catch (_) {
+      return dataUrl; // fall back to original on any failure
+    }
+  }
   function showPreview(dataUrl) {
     capturedDataUrl = dataUrl;
     const video = $('sj-video');
@@ -3587,20 +3635,22 @@ const SANJEEVANI = (() => {
   }
   function resetToCapture() {
     capturedDataUrl = null;
-    $('sj-preview').style.display = 'none';
-    $('sj-preview').src = '';
-    $('sj-video').style.display = 'block';
-    $('sj-capture').style.display = 'inline-flex';
-    $('sj-pick-file').style.display = 'inline-flex';
+    const pv = $('sj-preview'); if (pv) { pv.style.display = 'none'; pv.removeAttribute('src'); }
     $('sj-retake').style.display = 'none';
     $('sj-analyze').style.display = 'none';
     setAnalyzing(false);
-    // Drop any stale result so a reopened scanner never shows the previous scan
-    const ri = $('sj-result-image'); if (ri) ri.src = '';
+    // Drop any stale result so a reopened scanner never shows the previous scan.
+    // removeAttribute (not src='') so the browser never re-displays a cached frame.
+    const ri = $('sj-result-image'); if (ri) ri.removeAttribute('src');
     const rv = $('sj-result-view'); if (rv) rv.style.display = 'none';
     const fi = $('sj-file-input'); if (fi) fi.value = '';
     if (typeof showCaptureView === 'function') showCaptureView();
-    setStatus('Frame your meal and tap Capture.', '');
+    // Respect whichever tab the user is on so the previous photo never lingers.
+    const onUpload = (typeof currentTab !== 'undefined' && currentTab === 'upload');
+    $('sj-video').style.display = onUpload ? 'none' : 'block';
+    $('sj-capture').style.display = onUpload ? 'none' : 'inline-flex';
+    $('sj-pick-file').style.display = 'inline-flex';
+    setStatus(onUpload ? 'Pick a photo to analyze.' : 'Frame your meal and tap Capture.', '');
   }
 
   function setStatus(msg, kind = '') {
@@ -3978,6 +4028,16 @@ If not food: {"error":"not_food"}.`;
       swapEl.classList.remove('hidden');
     } else { swapEl.classList.add('hidden'); }
 
+    // Today's running tally (this scan is already saved via logMeal)
+    try {
+      const meals = (loadState().meals) || [];
+      const todayStr = new Date().toDateString();
+      const t = meals.filter(m => new Date(m.timestamp).toDateString() === todayStr);
+      const kcal = t.reduce((a, m) => a + (Number(m.calories_kcal) || 0), 0);
+      const tallyEl = $('sj-result-tally');
+      if (tallyEl) tallyEl.textContent = `${t.length} meal${t.length === 1 ? '' : 's'} · ${kcal} kcal so far today.`;
+    } catch (_) {}
+
     // Toggle screens inside dialog: hide capture UI, show result view
     $('sj-camera-view').style.display = 'none';
     $('sj-controls').style.display = 'none';
@@ -3999,12 +4059,14 @@ If not food: {"error":"not_food"}.`;
     setStatus(useAI ? 'Reading the plate…' : 'No API key — running demo analysis…', '');
     try {
       const meal = useAI ? await analyzeWithGemini(capturedDataUrl) : await new Promise(r => setTimeout(() => r(demoAnalyze()), 900));
-      meal.imageDataUrl = capturedDataUrl;
-      const saved = logMeal(meal);
+      // Persist only a small thumbnail so storage never overflows (which would
+      // silently drop the meal). The crisp full photo is still shown right now.
+      const thumb = await makeThumb(capturedDataUrl, 320);
+      const saved = logMeal({ ...meal, imageDataUrl: thumb });
       renderMeal(saved, capturedDataUrl);
       setAnalyzing(false);
       showResultView(saved, capturedDataUrl);
-      toast(`Saved: ${meal.name} (${meal.calories_kcal} kcal)`);
+      toast(`Saved to today: ${meal.name} (${meal.calories_kcal} kcal)`);
     } catch (err) {
       console.error(err);
       setStatus(err.message || 'Analysis failed. Try again.', 'error');
@@ -4094,6 +4156,9 @@ If not food: {"error":"not_food"}.`;
     $('sj-result-scan-another')?.addEventListener('click', () => {
       resetToCapture();
       if (currentTab === 'camera') startCamera();
+    });
+    $('sj-result-share')?.addEventListener('click', () => {
+      window.SANJEEVANI_REPORT?.shareToday?.();
     });
     $('sj-result-done')?.addEventListener('click', () => {
       closeScanner();
@@ -6082,6 +6147,15 @@ const SANJEEVANI_REPORT = (() => {
   function verdictColor(v) {
     return v === 'Healthy' ? C.glow : v === 'Moderate' ? C.haldi : v === 'Indulgent' ? C.coral : C.mute;
   }
+  function loadImg(src) {
+    return new Promise((res) => {
+      if (!src) return res(null);
+      const img = new Image();
+      img.onload = () => res(img);
+      img.onerror = () => res(null);
+      img.src = src;
+    });
+  }
   function todayMeals() {
     const meals = (SANJEEVANI.loadState().meals) || [];
     const today = new Date().toDateString();
@@ -6217,23 +6291,39 @@ const SANJEEVANI_REPORT = (() => {
     y += 38;
 
     const rows = today.slice(0, 5);
-    for (const m of rows) {
-      const h = 96, pad = 16;
-      ctx.fillStyle = C.card; rr(ctx, PAD, y, barW, h - pad, 20); ctx.fill();
-      const midY = y + (h - pad) / 2;
-      ctx.fillStyle = verdictColor(m.verdict);
-      ctx.beginPath(); ctx.arc(PAD + 36, midY, 11, 0, Math.PI * 2); ctx.fill();
+    const thumbs = await Promise.all(rows.map(m => loadImg(m.imageDataUrl)));
+    rows.forEach((m, i) => {
+      const h = 96, pad = 16, cardH = h - pad;
+      ctx.fillStyle = C.card; rr(ctx, PAD, y, barW, cardH, 20); ctx.fill();
+      const thumb = thumbs[i];
+      let textX = PAD + 70;
+      if (thumb && thumb.width) {
+        // Rounded, cover-fit food photo on the left of the row
+        const ts = cardH - 24, tx = PAD + 12, ty = y + 12;
+        ctx.save(); rr(ctx, tx, ty, ts, ts, 13); ctx.clip();
+        const ratio = Math.max(ts / thumb.width, ts / thumb.height);
+        const dw = thumb.width * ratio, dh = thumb.height * ratio;
+        ctx.drawImage(thumb, tx + (ts - dw) / 2, ty + (ts - dh) / 2, dw, dh);
+        ctx.restore();
+        // Verdict dot tucked into the photo's corner
+        ctx.fillStyle = verdictColor(m.verdict);
+        ctx.beginPath(); ctx.arc(tx + ts - 4, ty + 4, 7, 0, Math.PI * 2); ctx.fill();
+        textX = tx + ts + 18;
+      } else {
+        ctx.fillStyle = verdictColor(m.verdict);
+        ctx.beginPath(); ctx.arc(PAD + 36, y + cardH / 2, 11, 0, Math.PI * 2); ctx.fill();
+      }
       ctx.fillStyle = C.white; ctx.font = `700 33px ${BODY}`; ctx.textAlign = 'left';
-      ctx.fillText(ellipsize(ctx, m.name || 'Meal', barW - 360), PAD + 70, y + 36);
+      ctx.fillText(ellipsize(ctx, m.name || 'Meal', W - PAD - textX - 150), textX, y + 36);
       ctx.fillStyle = C.mute; ctx.font = `500 25px ${BODY}`;
-      ctx.fillText(`${m.protein_g || 0}g P · ${m.carbs_g || 0}g C · ${m.fats_g || 0}g F`, PAD + 70, y + 68);
+      ctx.fillText(`${m.protein_g || 0}g P · ${m.carbs_g || 0}g C · ${m.fats_g || 0}g F`, textX, y + 68);
       ctx.textAlign = 'right'; ctx.fillStyle = C.neon; ctx.font = `800 38px ${HEAD}`;
       ctx.fillText(`${m.calories_kcal || 0}`, W - PAD - 28, y + 42);
       ctx.fillStyle = C.faint; ctx.font = `500 22px ${BODY}`;
       ctx.fillText('kcal', W - PAD - 28, y + 70);
       ctx.textAlign = 'left';
       y += h;
-    }
+    });
     if (today.length > 5) {
       ctx.fillStyle = C.mute; ctx.font = `600 27px ${BODY}`;
       ctx.fillText(`+ ${today.length - 5} more`, PAD, y + 12);
