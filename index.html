@@ -4152,6 +4152,12 @@ If not food: {"error":"not_food"}.`;
       setAnalyzing(false);
       showResultView(saved, capturedDataUrl);
       toast(`Saved to today: ${meal.name} (${meal.calories_kcal} kcal)`);
+      // The scanner calls the inner logMeal directly, so refresh the home
+      // dashboard/timeline and push to the cloud here (the wrapper on the
+      // public SANJEEVANI.logMeal isn't on this path).
+      try { window.SANJEEVANI_DASH?.render(); } catch (_) {}
+      try { window.SANJEEVANI_TIMELINE?.render?.(); } catch (_) {}
+      try { window.SANJEEVANI_MEAL_SYNC?._push?.(saved); } catch (_) {}
     } catch (err) {
       console.error(err);
       setStatus(err.message || 'Analysis failed. Try again.', 'error');
@@ -5068,8 +5074,9 @@ const SANJEEVANI_MEAL_SYNC = (() => {
     init();
   }
 
-  return { _pull: pullFromCloud };
+  return { _pull: pullFromCloud, _push: pushMeal };
 })();
+window.SANJEEVANI_MEAL_SYNC = SANJEEVANI_MEAL_SYNC;
 
 
 /* ==================== SANJEEVANI PROFILE (goals + conditions + diet) ==================== */
