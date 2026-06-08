@@ -2709,7 +2709,7 @@ tailwind.config = {
           <p id="coach-title" class="coach-title">Sanjeevani Coach</p>
           <p class="coach-subtitle">
             <span class="coach-dot" aria-hidden="true"></span>
-            <span id="coach-status">Online · powered by Gemini</span>
+            <span id="coach-status">Online · grounded in your meals</span>
           </p>
         </div>
       </div>
@@ -4713,8 +4713,12 @@ Try this in the meantime: drink a glass of water and take 10 slow breaths.`;
 
     setupVoice();
 
-    if (!API_KEY) {
+    // Only truly "demo" when there's NO AI path at all. With no local key we
+    // use the server proxy (Groq-first), which is fully live — not demo.
+    if (!API_KEY && !USE_PROXY) {
       $('coach-status').textContent = 'Demo mode · add API key to config.local.js';
+    } else {
+      $('coach-status').textContent = 'Online · grounded in your meals';
     }
   }
 
