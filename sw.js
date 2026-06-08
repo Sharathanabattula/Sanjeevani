@@ -1,7 +1,7 @@
 // Sanjeevani Service Worker — minimal, install-friendly, offline-aware.
 // Versioned cache so a redeploy invalidates old assets cleanly.
 
-const VERSION = 'sj-v3';
+const VERSION = 'sj-v4';
 const CORE_CACHE = `${VERSION}-core`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 

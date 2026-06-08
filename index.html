@@ -7101,9 +7101,20 @@ const SANJEEVANI_WAITLIST = (() => {
 
   // --- service worker registration ---
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    // When a new SW takes control, reload once so the home-screen app shows the
+    // latest version (iOS standalone has no reload button to do this manually).
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloading) return; // skip the very first install
+      reloading = true;
+      window.location.reload();
+    });
+
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').then(reg => {
-        // If a new SW is waiting after deploy, activate it on next nav
+        // Activate a freshly-installed SW immediately (it then claims clients →
+        // controllerchange above → reload to the new version).
         reg.addEventListener('updatefound', () => {
           const nw = reg.installing;
           nw && nw.addEventListener('statechange', () => {
@@ -7112,8 +7123,57 @@ const SANJEEVANI_WAITLIST = (() => {
             }
           });
         });
+        // Proactively check for a new deploy now, and whenever the app is
+        // re-opened/foregrounded (PWAs are long-lived and rarely reload).
+        const checkUpdate = () => { try { reg.update(); } catch (_) {} };
+        checkUpdate();
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUpdate(); });
+        window.addEventListener('focus', checkUpdate);
       }).catch(err => console.warn('[PWA] SW registration failed:', err));
     });
+  }
+
+  // --- Pull-to-refresh for standalone PWAs (iOS has no reload button) ---
+  if (isStandalone) {
+    let startY = 0, pulling = false, dist = 0;
+    const THRESH = 72;
+    const ind = document.createElement('div');
+    ind.setAttribute('aria-hidden', 'true');
+    ind.style.cssText = 'position:fixed;top:0;left:50%;z-index:2147483647;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(5,18,5,0.94);border:1px solid rgba(0,230,118,0.45);color:#69F0AE;opacity:0;pointer-events:none;box-shadow:0 8px 22px -8px rgba(0,0,0,0.7);transform:translate(-50%,-52px);';
+    ind.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>';
+    const mount = () => { if (document.body && !ind.isConnected) document.body.appendChild(ind); };
+    if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
+
+    const atTop = () => (window.scrollY || document.documentElement.scrollTop || 0) <= 0;
+    const reset = () => { ind.style.opacity = '0'; ind.style.transform = 'translate(-50%,-52px)'; };
+
+    window.addEventListener('touchstart', (e) => {
+      // Don't fight an open modal's own scroll
+      if (!atTop() || document.querySelector('dialog[open]')) { pulling = false; return; }
+      startY = e.touches[0].clientY; pulling = true; dist = 0;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!pulling) return;
+      dist = e.touches[0].clientY - startY;
+      if (dist <= 0) { reset(); return; }
+      const pull = Math.min(dist, 130);
+      ind.style.opacity = String(Math.min(1, pull / THRESH));
+      ind.style.transform = `translate(-50%, ${Math.min(pull * 0.5, 68) - 52}px) rotate(${pull * 3}deg)`;
+      if (pull > 6 && atTop()) { try { e.preventDefault(); } catch (_) {} }
+    }, { passive: false });
+
+    window.addEventListener('touchend', () => {
+      if (!pulling) return;
+      const fire = dist > THRESH && atTop();
+      pulling = false;
+      if (fire) {
+        ind.style.opacity = '1';
+        ind.style.transform = 'translate(-50%, 16px) rotate(0deg)';
+        const svg = ind.querySelector('svg'); if (svg) svg.style.animation = 'sj-spin 0.7s linear infinite';
+        setTimeout(() => window.location.reload(), 240);
+      } else reset();
+    }, { passive: true });
   }
 
   // --- dismissal memory ---
