@@ -748,6 +748,23 @@ tailwind.config = {
   .dg-save-btn { padding: 9px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap;
     background: rgba(0,230,118,0.15); color: #69F0AE; border: 1px solid rgba(0,230,118,0.25); transition: background .15s ease; }
   .dg-save-btn:hover { background: rgba(0,230,118,0.25); }
+  /* ---- Mood & Stress ---- */
+  .mood-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 4px;
+    border-radius: 14px; background: rgba(76,175,80,0.05); border: 1px solid rgba(76,175,80,0.12);
+    cursor: pointer; transition: transform .12s ease, background .15s ease, border-color .15s ease; }
+  .mood-btn .mood-emoji { font-size: 26px; line-height: 1; filter: grayscale(0.35); transition: filter .15s ease, transform .12s ease; }
+  .mood-btn .mood-label { font-size: 10.5px; color: rgba(220,240,224,0.45); font-weight: 600; }
+  .mood-btn:hover { background: rgba(76,175,80,0.10); }
+  .mood-btn:hover .mood-emoji { transform: scale(1.08); }
+  .mood-btn:active { transform: scale(0.95); }
+  .mood-btn.is-active { background: rgba(0,230,118,0.12); border-color: rgba(0,230,118,0.45); }
+  .mood-btn.is-active .mood-emoji { filter: grayscale(0); transform: scale(1.12); }
+  .mood-btn.is-active .mood-label { color: #69F0AE; }
+  .stress-range { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 99px;
+    background: linear-gradient(90deg,#00E676,#F4B400 55%,#FF7043); outline: none; cursor: pointer; }
+  .stress-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; border: 3px solid #0A1F0A; box-shadow: 0 2px 8px rgba(0,0,0,0.4); cursor: pointer; }
+  .stress-range::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 3px solid #0A1F0A; cursor: pointer; }
   .profile-footer {
     padding: 16px 24px;
     border-top: 1px solid rgba(76, 175, 80, 0.10);
@@ -987,13 +1004,14 @@ tailwind.config = {
   .coach-avatar {
     width: 38px; height: 38px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1d1d1f, #3a3a3c);
+    background: linear-gradient(135deg, #00E676, #1B5E20);
     color: #fff;
     display: flex; align-items: center; justify-content: center;
     font-weight: 700;
+    font-size: 19px;
     font-family: 'Syne', sans-serif;
     letter-spacing: -0.02em;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 230, 118, 0.35);
     flex-shrink: 0;
   }
   .coach-title {
@@ -1981,6 +1999,50 @@ tailwind.config = {
           <p id="dg-signin-hint" class="text-forest-300/40 text-xs mt-2" style="display:none">Sign in to save your daily goals across devices.</p>
         </div>
 
+        <!-- Mood & Stress -->
+        <div class="relative mt-8">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-forest-300/60 text-xs uppercase tracking-wider font-semibold">Mood &amp; Stress</p>
+            <span id="ms-summary" class="text-forest-300/40 text-xs"></span>
+          </div>
+          <div class="rounded-2xl bg-forest-900/20 border border-forest-700/10 p-4">
+            <p class="text-sm font-semibold text-forest-100 mb-3">How are you feeling today?</p>
+            <div id="ms-mood-row" class="flex items-stretch gap-2 mb-5">
+              <button type="button" class="mood-btn" data-mood="Great"><span class="mood-emoji">😄</span><span class="mood-label">Great</span></button>
+              <button type="button" class="mood-btn" data-mood="Good"><span class="mood-emoji">🙂</span><span class="mood-label">Good</span></button>
+              <button type="button" class="mood-btn" data-mood="Okay"><span class="mood-emoji">😐</span><span class="mood-label">Okay</span></button>
+              <button type="button" class="mood-btn" data-mood="Low"><span class="mood-emoji">😔</span><span class="mood-label">Low</span></button>
+              <button type="button" class="mood-btn" data-mood="Stressed"><span class="mood-emoji">😰</span><span class="mood-label">Stressed</span></button>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-semibold text-forest-100">Stress level</span>
+              <span class="text-sm"><span id="ms-stress-val" class="font-display font-bold text-white">—</span><span id="ms-stress-tag" class="text-forest-300/50 text-xs ml-1.5"></span></span>
+            </div>
+            <input id="ms-stress-range" type="range" min="0" max="100" step="1" value="40" class="stress-range" aria-label="Stress level">
+            <div class="flex justify-between text-[10px] text-forest-300/40 mt-1.5 mb-4"><span>Calm</span><span>Moderate</span><span>High</span></div>
+            <div class="flex items-end justify-between gap-3 pt-3 border-t border-forest-700/15">
+              <div>
+                <p class="text-forest-300/50 text-[10px] uppercase tracking-wider mb-1.5">Last 7 days</p>
+                <canvas id="ms-spark" width="220" height="46" style="width:220px;height:46px;max-width:100%"></canvas>
+              </div>
+              <span id="ms-saved" class="text-forest-glow text-xs font-medium opacity-0 transition-opacity">Saved ✓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Health Timeline -->
+        <button id="dash-timeline-open" type="button"
+          class="relative mt-3 w-full flex items-center justify-between gap-2.5 py-3.5 px-5 rounded-2xl text-left bg-forest-800/40 border border-forest-700/30 hover:border-forest-glow/40 hover:bg-forest-800/60 active:scale-[0.99] transition">
+          <span class="flex items-center gap-3">
+            <span class="text-lg">🗓️</span>
+            <span>
+              <span class="block font-display font-bold text-base text-forest-100">Health Timeline</span>
+              <span class="block text-forest-300/50 text-xs">Your day, as a story</span>
+            </span>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-forest-glow"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+
         <!-- Recent meals -->
         <div class="relative mt-8">
           <div class="flex items-center justify-between mb-3">
@@ -2704,9 +2766,9 @@ tailwind.config = {
     <!-- Header -->
     <div class="coach-header">
       <div class="coach-title-wrap">
-        <div class="coach-avatar">S</div>
+        <div class="coach-avatar">🌿</div>
         <div>
-          <p id="coach-title" class="coach-title">Sanjeevani Coach</p>
+          <p id="coach-title" class="coach-title">Jeeva</p>
           <p class="coach-subtitle">
             <span class="coach-dot" aria-hidden="true"></span>
             <span id="coach-status">Online · grounded in your meals</span>
@@ -3284,6 +3346,22 @@ tailwind.config = {
     <div class="px-6 pb-6 flex justify-end gap-2">
       <button id="sj-history-clear" type="button" class="sj-btn sj-btn-ghost text-sm">Clear all</button>
     </div>
+  </div>
+</dialog>
+
+<!-- ==================== HEALTH TIMELINE DIALOG ==================== -->
+<dialog id="timeline-dialog" class="sj-dialog" aria-labelledby="timeline-title">
+  <div class="sj-dialog-shell">
+    <div class="flex items-center justify-between px-6 pt-6 pb-4">
+      <div>
+        <h3 id="timeline-title" class="font-display font-bold text-xl text-white">Health Timeline</h3>
+        <p id="timeline-date" class="text-forest-300/60 text-xs mt-1">Your day, as a story</p>
+      </div>
+      <button id="timeline-close" type="button" aria-label="Close timeline" class="w-9 h-9 rounded-full bg-forest-800/40 hover:bg-forest-700/50 flex items-center justify-center text-forest-200/70 hover:text-white transition-colors">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div id="timeline-list" class="px-6 pb-6 max-h-[64vh] overflow-y-auto"></div>
   </div>
 </dialog>
 
@@ -4341,9 +4419,9 @@ Use these results to inform nutrition advice (e.g. high LDL → soluble fibre, l
 `
       : '';
 
-    return `You are Sanjeevani, an AI health coach for users in India and the Indian diaspora.
+    return `You are Jeeva, the warm AI health companion inside the Sanjeevani app, for users in India and the Indian diaspora.
 
-Personality: Warm, precise, never preachy. Speak like a smart friend who happens to be a registered dietitian. Code-switch into Hindi / Tamil / Telugu / Bengali words ONLY when it genuinely helps (food names, cultural context) — never to seem trendy.
+Personality: Warm, precise, never preachy. Speak like a smart friend who happens to be a registered dietitian. When the user seems low or stressed (see mood/stress below), lead with empathy before advice. Code-switch into Hindi / Tamil / Telugu / Bengali words ONLY when it genuinely helps (food names, cultural context) — never to seem trendy.
 
 Rules:
 - Default response length: 2-4 short sentences. Use bullet points only when listing 3+ items.
@@ -4362,8 +4440,10 @@ ${mealLines}
 - Water logged today: ${s.water_ml || 0} ml
 - Steps today: ${s.steps || 0}
 - Sleep last night: ${s.sleep_hours != null ? s.sleep_hours + ' h' : 'not logged'}
+- Mood today: ${s.mood ? s.mood : 'not logged'}
+- Stress level today: ${s.stress != null ? s.stress + '/100' : 'not logged'}
 
-If the user references "my meal" or "today" without specifics, use the meal context above.`;
+If the user references "my meal" or "today" without specifics, use the meal context above. If their mood is Low/Stressed or stress is high (>60), acknowledge it warmly and offer one small calming or supportive step.`;
   }
 
   // ---- Render ----
@@ -4422,7 +4502,7 @@ If the user references "my meal" or "today" without specifics, use the meal cont
       messages.innerHTML = `
         <div class="coach-empty">
           <div class="coach-empty-title">Hi there 👋</div>
-          <p class="coach-empty-subtitle">I'm your Sanjeevani Coach. I can see your scanned meals and help you plan, troubleshoot, or just answer questions. Try one of these:</p>
+          <p class="coach-empty-subtitle">I'm Jeeva, your Sanjeevani health companion. I can see your scanned meals, mood and daily logs, and help you plan, troubleshoot, or just answer questions. Try one of these:</p>
           <div class="coach-empty-grid">
             <button type="button" class="coach-empty-card" data-coach-chip>
               <div class="coach-empty-card-title">Plan my dinner</div>
@@ -5529,10 +5609,27 @@ const SANJEEVANI_DAILY = (() => {
   const sb = () => window.SANJEEVANI_SB;
 
   let userId = null;
-  let today = { water_ml: 0, steps: 0, sleep_hours: null };
+  let today = { water_ml: 0, steps: 0, sleep_hours: null, mood: null, stress: null };
   let saveTimer = null;
 
   const todayKey = () => new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD (local)
+
+  function stressInfo(v) {
+    if (v == null) return { label: '', color: 'rgba(220,240,224,0.5)' };
+    if (v < 34) return { label: 'Calm', color: '#00E676' };
+    if (v < 67) return { label: 'Moderate', color: '#F4B400' };
+    return { label: 'High', color: '#FF7043' };
+  }
+  // Rolling 14-day history of mood/stress for the sparkline (local-first).
+  function pushHistory() {
+    const s = SANJEEVANI.loadState();
+    const hist = Array.isArray(s.moodHistory) ? s.moodHistory.filter(h => h && h.date) : [];
+    const i = hist.findIndex(h => h.date === todayKey());
+    const entry = { date: todayKey(), stress: today.stress, mood: today.mood };
+    if (i >= 0) hist[i] = entry; else hist.push(entry);
+    hist.sort((a, b) => a.date.localeCompare(b.date));
+    SANJEEVANI.patchState({ moodHistory: hist.slice(-14) });
+  }
 
   function goals() {
     const P = window.SANJEEVANI_PROFILE;
@@ -5548,9 +5645,10 @@ const SANJEEVANI_DAILY = (() => {
   function loadLocal() {
     const s = SANJEEVANI.loadState();
     if (s.daily && s.daily.date === todayKey()) {
-      today = { water_ml: s.daily.water_ml || 0, steps: s.daily.steps || 0, sleep_hours: s.daily.sleep_hours ?? null };
+      today = { water_ml: s.daily.water_ml || 0, steps: s.daily.steps || 0, sleep_hours: s.daily.sleep_hours ?? null,
+        mood: s.daily.mood ?? null, stress: s.daily.stress ?? null };
     } else {
-      today = { water_ml: 0, steps: 0, sleep_hours: null };
+      today = { water_ml: 0, steps: 0, sleep_hours: null, mood: null, stress: null };
     }
   }
   function persistLocal() {
@@ -5558,7 +5656,9 @@ const SANJEEVANI_DAILY = (() => {
     SANJEEVANI.patchState({
       daily: { date: todayKey(), ...today },
       water_ml: today.water_ml, steps: today.steps, sleep_hours: today.sleep_hours,
+      mood: today.mood, stress: today.stress,
     });
+    pushHistory();
   }
 
   function setBar(id, frac) { const b = $(id); if (b) b.style.width = Math.min(100, Math.max(0, frac * 100)) + '%'; }
@@ -5586,6 +5686,54 @@ const SANJEEVANI_DAILY = (() => {
       $('dg-summary').textContent = done.length ? `${done.length}/3 goals met ✓` : '';
     }
     const hint = $('dg-signin-hint'); if (hint) hint.style.display = userId ? 'none' : '';
+
+    renderMood();
+  }
+
+  function renderMood() {
+    // Mood chips
+    document.querySelectorAll('#ms-mood-row .mood-btn').forEach(b => {
+      b.classList.toggle('is-active', b.dataset.mood === today.mood);
+    });
+    // Stress slider + label
+    const si = stressInfo(today.stress);
+    if ($('ms-stress-range') && today.stress != null) $('ms-stress-range').value = today.stress;
+    if ($('ms-stress-val')) $('ms-stress-val').textContent = today.stress != null ? `${today.stress}/100` : '—';
+    if ($('ms-stress-tag')) { $('ms-stress-tag').textContent = si.label; $('ms-stress-tag').style.color = si.color; }
+    if ($('ms-summary')) {
+      $('ms-summary').textContent = today.mood ? `Feeling ${today.mood.toLowerCase()}` + (today.stress != null ? ` · ${si.label.toLowerCase()} stress` : '') : '';
+    }
+    drawSpark();
+  }
+
+  function drawSpark() {
+    const cv = $('ms-spark'); if (!cv || !cv.getContext) return;
+    const ctx = cv.getContext('2d'); const W = cv.width, H = cv.height;
+    ctx.clearRect(0, 0, W, H);
+    const s = SANJEEVANI.loadState();
+    const hist = (Array.isArray(s.moodHistory) ? s.moodHistory : []).slice(-7);
+    const pts = hist.filter(h => h && h.stress != null);
+    if (pts.length < 2) {
+      ctx.fillStyle = 'rgba(220,240,224,0.30)'; ctx.font = "12px 'Plus Jakarta Sans', sans-serif"; ctx.textBaseline = 'middle';
+      ctx.fillText(pts.length === 1 ? 'Keep logging to see your trend' : 'Log stress to start your trend', 0, H / 2);
+      return;
+    }
+    const pad = 6, n = pts.length;
+    const x = (i) => pad + (i * (W - pad * 2)) / (n - 1);
+    const y = (v) => H - pad - (Math.max(0, Math.min(100, v)) / 100) * (H - pad * 2);
+    // line
+    const grad = ctx.createLinearGradient(0, 0, W, 0);
+    grad.addColorStop(0, '#00E676'); grad.addColorStop(1, '#69F0AE');
+    ctx.strokeStyle = grad; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath();
+    pts.forEach((p, i) => { i ? ctx.lineTo(x(i), y(p.stress)) : ctx.moveTo(x(i), y(p.stress)); });
+    ctx.stroke();
+    // dots (last one highlighted)
+    pts.forEach((p, i) => {
+      ctx.beginPath(); ctx.arc(x(i), y(p.stress), i === n - 1 ? 4 : 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = i === n - 1 ? stressInfo(p.stress).color : 'rgba(255,255,255,0.55)';
+      ctx.fill();
+    });
   }
 
   function scheduleCloudSave() { if (saveTimer) clearTimeout(saveTimer); saveTimer = setTimeout(cloudSave, 900); }
@@ -5594,6 +5742,7 @@ const SANJEEVANI_DAILY = (() => {
     const payload = {
       user_id: userId, log_date: todayKey(),
       water_ml: today.water_ml, steps: today.steps, sleep_hours: today.sleep_hours,
+      mood: today.mood, stress_score: today.stress,
       updated_at: new Date().toISOString(),
     };
     const { error } = await sb().schema(SCHEMA).from(TABLE).upsert(payload, { onConflict: 'user_id,log_date' });
@@ -5608,14 +5757,37 @@ const SANJEEVANI_DAILY = (() => {
   async function pull() {
     if (!userId || !sb()) return;
     const { data, error } = await sb().schema(SCHEMA).from(TABLE)
-      .select('water_ml, steps, sleep_hours, log_date')
+      .select('water_ml, steps, sleep_hours, mood, stress_score, log_date')
       .eq('user_id', userId).eq('log_date', todayKey()).maybeSingle();
     if (error) { console.error('[Daily] pull error:', error); render(); return; }
     if (data) {
-      today = { water_ml: data.water_ml || 0, steps: data.steps || 0, sleep_hours: data.sleep_hours ?? null };
+      today = { water_ml: data.water_ml || 0, steps: data.steps || 0, sleep_hours: data.sleep_hours ?? null,
+        mood: data.mood ?? null, stress: data.stress_score ?? null };
       persistLocal();
     }
+    // Backfill the sparkline from the last 7 days in the cloud (best-effort).
+    pullHistory();
     render();
+  }
+
+  async function pullHistory() {
+    if (!userId || !sb()) return;
+    const since = new Date(Date.now() - 13 * 864e5).toLocaleDateString('en-CA');
+    const { data, error } = await sb().schema(SCHEMA).from(TABLE)
+      .select('log_date, mood, stress_score')
+      .eq('user_id', userId).gte('log_date', since).order('log_date', { ascending: true });
+    if (error || !Array.isArray(data)) return;
+    const hist = data.filter(d => d.stress_score != null || d.mood != null)
+      .map(d => ({ date: d.log_date, stress: d.stress_score ?? null, mood: d.mood ?? null }));
+    if (hist.length) { SANJEEVANI.patchState({ moodHistory: hist.slice(-14) }); drawSpark(); }
+  }
+
+  let savedTimer = null;
+  function flashSaved() {
+    const el = $('ms-saved'); if (!el) return;
+    el.style.opacity = '1';
+    clearTimeout(savedTimer);
+    savedTimer = setTimeout(() => { el.style.opacity = '0'; }, 1600);
   }
 
   function bind() {
@@ -5630,6 +5802,30 @@ const SANJEEVANI_DAILY = (() => {
       const v = parseFloat($('dg-sleep-input')?.value);
       if (isFinite(v) && v >= 0 && v <= 24) { today.sleep_hours = Math.round(v * 10) / 10; $('dg-sleep-input').value = ''; commit(true); window.SANJEEVANI?.toast?.('Sleep logged 😴'); }
     });
+    // Mood chips
+    document.querySelectorAll('#ms-mood-row .mood-btn').forEach(b => {
+      b.addEventListener('click', () => {
+        today.mood = (today.mood === b.dataset.mood) ? null : b.dataset.mood; // tap again to clear
+        // First mood pick seeds a sensible default stress if none set yet
+        if (today.mood && today.stress == null) {
+          today.stress = ({ Great: 15, Good: 30, Okay: 50, Low: 65, Stressed: 80 })[today.mood] ?? 40;
+        }
+        commit(true); flashSaved();
+        if (today.mood) window.SANJEEVANI?.toast?.(`Mood: ${today.mood}`);
+      });
+    });
+    // Stress slider — live label while dragging, save on release
+    const range = $('ms-stress-range');
+    if (range) {
+      range.addEventListener('input', () => {
+        today.stress = parseInt(range.value, 10);
+        const si = stressInfo(today.stress);
+        if ($('ms-stress-val')) $('ms-stress-val').textContent = `${today.stress}/100`;
+        if ($('ms-stress-tag')) { $('ms-stress-tag').textContent = si.label; $('ms-stress-tag').style.color = si.color; }
+      });
+      const commitStress = () => { if (today.stress == null) today.stress = parseInt(range.value, 10); commit(true); flashSaved(); };
+      range.addEventListener('change', commitStress);
+    }
   }
 
   function init() {
@@ -6396,6 +6592,106 @@ const SANJEEVANI_REPORT = (() => {
   return { shareToday };
 })();
 window.SANJEEVANI_REPORT = SANJEEVANI_REPORT;
+
+
+/* ==================== SANJEEVANI HEALTH TIMELINE ==================== */
+const SANJEEVANI_TIMELINE = (() => {
+  const $ = (id) => document.getElementById(id);
+  const MOOD_EMOJI = { Great: '😄', Good: '🙂', Okay: '😐', Low: '😔', Stressed: '😰' };
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  function verdictColor(v) { return v === 'Healthy' ? '#00E676' : v === 'Moderate' ? '#F4B400' : v === 'Indulgent' ? '#FF7043' : 'rgba(220,240,224,0.5)'; }
+  function stressLabel(v) { return v == null ? '' : v < 34 ? 'Calm' : v < 67 ? 'Moderate' : 'High'; }
+  function fmtTime(ts) { try { return new Date(ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (_) { return ''; } }
+
+  function buildEntries() {
+    const s = SANJEEVANI.loadState();
+    const todayStr = new Date().toDateString();
+    const d = (s.daily && s.daily.date === new Date().toLocaleDateString('en-CA')) ? s.daily : {};
+    const entries = [];
+
+    // Sleep (last night)
+    if (d.sleep_hours != null) {
+      const good = d.sleep_hours >= 7;
+      entries.push({ order: 0, icon: '🌙', color: '#7C4DFF', title: `Slept ${d.sleep_hours} h`,
+        sub: good ? 'Well rested — nice.' : 'A little short — aim for 7–9 h tonight.' });
+    }
+
+    // Meals (real timestamps)
+    const meals = (s.meals || []).filter(m => new Date(m.timestamp).toDateString() === todayStr)
+      .sort((a, b) => a.timestamp - b.timestamp);
+    meals.forEach(m => {
+      entries.push({ order: m.timestamp, time: fmtTime(m.timestamp), icon: '🍽️', color: verdictColor(m.verdict),
+        title: m.name || 'Meal', sub: `${m.calories_kcal || 0} kcal · ${m.protein_g || 0}g protein${m.verdict ? ' · ' + m.verdict : ''}` });
+    });
+
+    // Hydration
+    if (d.water_ml) entries.push({ order: 1e12 + 1, icon: '💧', color: '#29B6F6', title: 'Hydration',
+      sub: `${(d.water_ml / 1000).toFixed(d.water_ml % 1000 ? 1 : 0)} L logged today` });
+    // Steps
+    if (d.steps) entries.push({ order: 1e12 + 2, icon: '👟', color: '#66BB6A', title: 'Movement',
+      sub: `${d.steps.toLocaleString()} steps` });
+    // Mood
+    if (d.mood) entries.push({ order: 1e12 + 3, icon: MOOD_EMOJI[d.mood] || '🙂', color: '#00E676', title: `Mood: ${d.mood}`,
+      sub: d.stress != null ? `Stress ${d.stress}/100 · ${stressLabel(d.stress)}` : 'Logged how you feel' });
+    else if (d.stress != null) entries.push({ order: 1e12 + 3, icon: '🧘', color: '#F4B400', title: `Stress ${d.stress}/100`,
+      sub: stressLabel(d.stress) });
+
+    entries.sort((a, b) => a.order - b.order);
+
+    // Closing Jeeva note
+    const insight = $('dash-insight')?.textContent?.trim();
+    if (entries.length) entries.push({ order: Infinity, icon: '🌿', color: '#69F0AE', title: 'Jeeva',
+      sub: insight && !/scan your first meal/i.test(insight) ? insight : 'Every small log builds a clearer picture of your health. Keep going 💚', isJeeva: true });
+
+    return entries;
+  }
+
+  function render() {
+    const list = $('timeline-list'); if (!list) return;
+    const dt = $('timeline-date');
+    if (dt) dt.textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+    const entries = buildEntries();
+    if (!entries.length) {
+      list.innerHTML = `<div class="text-center py-10">
+        <p class="text-4xl mb-3">🗓️</p>
+        <p class="text-forest-100 font-semibold">Your story starts with one log</p>
+        <p class="text-forest-300/50 text-sm mt-1.5">Scan a meal, log your mood, or add water — and it'll appear here as your day unfolds.</p>
+      </div>`;
+      return;
+    }
+    list.innerHTML = entries.map((e, i) => {
+      const last = i === entries.length - 1;
+      const connector = last ? '' : `<div class="flex-1 w-px my-1" style="background:rgba(76,175,80,0.22)"></div>`;
+      return `<div class="flex gap-3.5">
+        <div class="flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0" style="background:${e.color}1f; border:1px solid ${e.color}55">${esc(e.icon)}</div>
+          ${connector}
+        </div>
+        <div class="${last ? 'pb-2' : 'pb-5'} flex-1 min-w-0 ${e.isJeeva ? 'rounded-xl bg-forest-glow/8 border border-forest-glow/20 px-3.5 py-2.5 -mt-0.5' : 'pt-1.5'}">
+          <div class="flex items-center gap-2 flex-wrap">
+            <p class="font-semibold text-white text-sm leading-tight">${esc(e.title)}</p>
+            ${e.time ? `<span class="text-forest-300/40 text-[11px] font-mono">${esc(e.time)}</span>` : ''}
+          </div>
+          <p class="text-forest-300/65 text-xs mt-0.5 leading-relaxed">${esc(e.sub)}</p>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function open() { render(); $('timeline-dialog')?.showModal(); }
+  function close() { const d = $('timeline-dialog'); if (d?.open) d.close(); }
+
+  function init() {
+    $('dash-timeline-open')?.addEventListener('click', open);
+    $('timeline-close')?.addEventListener('click', close);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  return { open, close, render };
+})();
+window.SANJEEVANI_TIMELINE = SANJEEVANI_TIMELINE;
 
 
 /* ==================== SANJEEVANI WAITLIST ENGINE ==================== */

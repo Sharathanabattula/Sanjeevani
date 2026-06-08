@@ -207,10 +207,16 @@ create table if not exists sanjeevani.daily_logs (
   water_ml int default 0,
   steps int default 0,
   sleep_hours numeric default null,
+  mood text default null,
+  stress_score int default null,
   created_at timestamptz default now(),
   updated_at timestamptz default now(),
   unique (user_id, log_date)
 );
+
+-- Mood & stress (added 2026-06-08). Safe to re-run on an existing table.
+alter table sanjeevani.daily_logs add column if not exists mood text default null;
+alter table sanjeevani.daily_logs add column if not exists stress_score int default null;
 
 create index if not exists daily_logs_user_date_idx on sanjeevani.daily_logs(user_id, log_date desc);
 
