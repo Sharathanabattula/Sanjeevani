@@ -3418,24 +3418,31 @@ tailwind.config = {
 
   bindAuthDialog();
 
-  // Make nav/footer links open the actual feature modals instead of just scrolling.
+  sb.auth.getSession().then(({ data }) => render(data.session));
+  sb.auth.onAuthStateChange((_event, session) => render(session));
+})();
+</script>
+
+<!-- ==================== CTA / NAV LINK ROUTING ==================== -->
+<!-- Standalone (NOT gated behind auth) so the hero "Scan your first meal" /
+     "talk to the coach" buttons always open the real modals, even if Supabase
+     or its CDN library failed to load. -->
+<script>
+(() => {
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href="#coach"], a[href="#scanner"]');
     if (!a) return;
-    const target = a.getAttribute('href');
     e.preventDefault();
     document.getElementById('mobileMenu')?.classList.remove('open');
+    const target = a.getAttribute('href');
     if (target === '#coach') {
-      try { window.SANJEEVANI_COACH?.open(); }
-      catch (_) { document.getElementById('coach-open-btn')?.click(); }
+      if (window.SANJEEVANI_COACH?.open) { try { window.SANJEEVANI_COACH.open(); return; } catch (_) {} }
+      document.getElementById('coach-open-btn')?.click();
     } else if (target === '#scanner') {
-      try { window.SANJEEVANI?.openScanner(); }
-      catch (_) { document.getElementById('sj-open-scanner')?.click(); }
+      if (window.SANJEEVANI?.openScanner) { try { window.SANJEEVANI.openScanner(); return; } catch (_) {} }
+      document.getElementById('sj-open-scanner')?.click();
     }
   });
-
-  sb.auth.getSession().then(({ data }) => render(data.session));
-  sb.auth.onAuthStateChange((_event, session) => render(session));
 })();
 </script>
 
@@ -4191,6 +4198,7 @@ If not food: {"error":"not_food"}.`;
   // Public API for future features (Coach, dashboard hookups)
   return { openScanner, closeScanner, loadState, saveState, patchState, logMeal, clearMeals, toast };
 })();
+window.SANJEEVANI = SANJEEVANI;
 
 
 /* ==================== SANJEEVANI COACH ENGINE ==================== */
@@ -4718,6 +4726,7 @@ Try this in the meantime: drink a glass of water and take 10 slow breaths.`;
 
   return { open, close, newConversation, sendUserMessage, _refresh: render };
 })();
+window.SANJEEVANI_COACH = SANJEEVANI_COACH;
 
 
 /* ==================== SANJEEVANI COACH SYNC (Supabase) ==================== */
