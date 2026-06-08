@@ -1702,27 +1702,27 @@ tailwind.config = {
             <div class="w-7 h-7 rounded-full bg-forest-glow/15 border border-forest-glow/30 flex items-center justify-center">
               <span class="w-2 h-2 rounded-full bg-forest-glow"></span>
             </div>
-            <span class="text-forest-100 text-[13px] font-medium">Today's scan</span>
+            <span id="hero-meal-label" class="text-forest-100 text-[13px] font-medium">Today's scan</span>
           </div>
-          <span class="text-forest-300/45 text-[11px] font-mono">12:42 PM</span>
+          <span id="hero-meal-time" class="text-forest-300/45 text-[11px] font-mono">12:42 PM</span>
         </div>
 
-        <p class="text-parchment-50 font-display text-2xl leading-tight mb-1">Chole Bhature</p>
-        <p class="text-forest-300/55 text-[12.5px] mb-5">2 bhature · chole · onion, pickle &mdash; restaurant-style</p>
+        <p id="hero-meal-name" class="text-parchment-50 font-display text-2xl leading-tight mb-1">Chole Bhature</p>
+        <p id="hero-meal-desc" class="text-forest-300/55 text-[12.5px] mb-5">2 bhature · chole · onion, pickle &mdash; restaurant-style</p>
 
         <div class="flex items-baseline gap-5 mb-5">
           <div>
-            <div class="text-forest-glow font-display font-bold text-3xl tracking-tight">720<span class="text-forest-300/50 text-base font-light"> kcal</span></div>
+            <div class="text-forest-glow font-display font-bold text-3xl tracking-tight"><span id="hero-meal-kcal">720</span><span class="text-forest-300/50 text-base font-light"> kcal</span></div>
           </div>
-          <div class="text-[11px] text-haldi-100 bg-haldi-700/20 border border-haldi-500/30 px-2 py-0.5 rounded-full">~4 tsp hidden oil</div>
+          <div id="hero-meal-oil" class="text-[11px] text-haldi-100 bg-haldi-700/20 border border-haldi-500/30 px-2 py-0.5 rounded-full">~4 tsp hidden oil</div>
         </div>
 
-        <div class="rounded-xl p-4 border border-forest-glow/25 bg-forest-glow/[0.06] mb-4">
+        <div id="hero-meal-swap-block" class="rounded-xl p-4 border border-forest-glow/25 bg-forest-glow/[0.06] mb-4">
           <p class="text-forest-glow text-[10px] font-bold tracking-[0.15em] uppercase mb-2">Smart swap</p>
-          <p class="text-parchment-50 text-[13.5px] leading-relaxed">
+          <p id="hero-meal-swap" class="text-parchment-50 text-[13.5px] leading-relaxed">
             Try <em class="not-italic font-semibold text-white">2 whole-wheat rotis + cucumber raita</em> instead of 2 bhature.
           </p>
-          <p class="text-forest-200/55 text-[11.5px] leading-relaxed mt-2 pt-2 border-t border-forest-glow/15">
+          <p id="hero-meal-swap-why" class="text-forest-200/55 text-[11.5px] leading-relaxed mt-2 pt-2 border-t border-forest-glow/15">
             Cuts ~3 tsp cooking oil, adds 8g yogurt protein, ~18% lower sugar spike.
           </p>
         </div>
@@ -6190,12 +6190,44 @@ const SANJEEVANI_DASH = (() => {
     return `${today.length} meal${today.length>1?'s':''}, ${kcal} kcal, ${protein}g protein today. You're on track — keep it steady.`;
   }
 
+  // The hero "Today's scan" tile is a static demo until the user has a real
+  // scan — then it mirrors their latest meal (so it never sits on stale demo data).
+  function hydrateHero(meals) {
+    const nameEl = $('hero-meal-name');
+    if (!nameEl) return;
+    const latest = (meals || [])[0]; // logMeal keeps newest first
+    if (!latest) return; // brand-new visitor → keep the Chole Bhature demo
+    const isToday = new Date(latest.timestamp).toDateString() === new Date().toDateString();
+    const set = (id, txt) => { const e = $(id); if (e) e.textContent = txt; };
+    set('hero-meal-label', isToday ? "Today's scan" : 'Latest scan');
+    set('hero-meal-time', latest.timestamp ? new Date(latest.timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '');
+    set('hero-meal-name', latest.name || 'Meal');
+    set('hero-meal-desc', latest.description || (latest.cooking_method ? String(latest.cooking_method).replace(/-/g, ' ') : ''));
+    set('hero-meal-kcal', String(latest.calories_kcal || 0));
+    const oilEl = $('hero-meal-oil');
+    if (oilEl) {
+      const oil = Number(latest.hidden_oil_tsp) || 0;
+      if (oil > 0) { oilEl.style.display = ''; oilEl.textContent = `~${oil} tsp hidden oil`; }
+      else oilEl.style.display = 'none';
+    }
+    const swap = latest.smart_swap, block = $('hero-meal-swap-block');
+    if (swap && (swap.swap_to || swap.instead_of) && block) {
+      block.style.display = '';
+      const swapEl = $('hero-meal-swap');
+      if (swapEl) swapEl.innerHTML = `Try <em class="not-italic font-semibold text-white">${escapeHtml(swap.swap_to || '—')}</em> instead of ${escapeHtml(swap.instead_of || 'this')}.`;
+      set('hero-meal-swap-why', swap.why || '');
+    } else if (block) {
+      block.style.display = 'none';
+    }
+  }
+
   function render() {
     const dash = $('dashboard');
-    if (!dash) return;
-
     const state = SANJEEVANI.loadState();
     const meals = state.meals || [];
+    hydrateHero(meals); // hero tile lives outside #dashboard — refresh it regardless
+    if (!dash) return;
+
     const today = todayMeals(meals);
     const user = window.SANJEEVANI_SB ? null : null; // placeholder
     let displayName = 'Friend';
